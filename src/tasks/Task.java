@@ -1,3 +1,5 @@
+package tasks;
+
 import java.util.Objects;
 
 public class Task {
@@ -17,7 +19,7 @@ public class Task {
         this.title = title;
         this.description = "-";
         ID = 0;
-        status = TaskStatus.NEW;
+        //      status = TaskStatus.NEW;
     }
 
     @Override

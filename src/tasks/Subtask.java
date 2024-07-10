@@ -1,8 +1,11 @@
+
 /*
  * Класс описания подзадачи.
  * При создании обязательно нужно указать объект "эпик", которому привязан.
  */
-public class Subtask extends Task {
+package tasks;
+
+public class Subtask extends Task  {
     private Epic epic;
 
     // При вызове конструктора указание объекта задачи "эпик" обязательно
@@ -38,7 +41,8 @@ public class Subtask extends Task {
      * Метод изменения статуса выполнения подзадачи.
      * После изменения собственного статуса запускаем пересчет статуса эпика.
      */
-    public void setStatus(TaskStatus newStatus) {
+
+     public void setStatus(TaskStatus newStatus) {
         super.setStatus(newStatus);
         if (epic != null) {
             epic.calculateStatus();

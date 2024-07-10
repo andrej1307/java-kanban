@@ -1,6 +1,7 @@
 /**
  * Программа демонстрации методов класса TaskManager
  */
+import tasks.*;
 import java.util.ArrayList;
 
 public class Main {
@@ -8,6 +9,7 @@ public class Main {
     public static TaskManager taskManager = new TaskManager();
 
     public static void main(String[] args) {
+
         // добавляем простую задачу
         taskManager.addTask(new Task("Выпить кофе",
                 "Кофе с молоком, 1 ложка сахара."));
@@ -113,13 +115,12 @@ public class Main {
     }
 
     public static void printAllTasks() {
-        System.out.println("\nВ списке задач " + taskManager.getTaskNumber() + " записей.");
+        System.out.println("\nВ списке задач " + taskManager.getTaskListSize() + " записей.");
         ArrayList<String> taskTextList = taskManager.getStringsAllTasks(TaskFilter.ALL);
         if (taskTextList == null) return;
         for (String str : taskTextList) {
             System.out.println(str);
         }
-
     }
 
 }

@@ -1,3 +1,5 @@
+import tasks.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -32,17 +34,17 @@ public class TaskManager {
         for (Integer index : taskList.keySet()) {
             switch (filter) {
                 case TASK:
-                    if(taskList.get(index).getClass().getCanonicalName().equals("Task")) {
+                    if(taskList.get(index).getClass().getCanonicalName().equals("tasks.Task")) {
                         recordSet.add(getStringFromObject(taskList.get(index)));
                     }
                     break;
                 case EPIC:
-                    if(taskList.get(index).getClass().getCanonicalName().equals("Epic")) {
+                    if(taskList.get(index).getClass().getCanonicalName().equals("tasks.Epic")) {
                         recordSet.add(getStringFromObject(taskList.get(index)));
                     }
                     break;
                 case SUBTASK:
-                    if(taskList.get(index).getClass().getCanonicalName().equals("Subtask")) {
+                    if(taskList.get(index).getClass().getCanonicalName().equals("tasks.Subtask")) {
                         recordSet.add(getStringFromObject(taskList.get(index)));
                     }
                     break;
@@ -57,16 +59,16 @@ public class TaskManager {
 
     // Метод выдачи строки информации об объекте с учетом класса задачи
     public String getStringFromObject(Task task) {
-        if (task.getClass().getCanonicalName().equals("Task")) {
+        if (task.getClass().getCanonicalName().equals("tasks.Task")) {
             return task.toString();
-        } else if (task.getClass().getCanonicalName().equals("Epic")) {
+        } else if (task.getClass().getCanonicalName().equals("tasks.Epic")) {
             Epic epic = (Epic) task;
             return epic.toString();
-        } else if (task.getClass().getCanonicalName().equals("Subtask")) {
+        } else if (task.getClass().getCanonicalName().equals("tasks.Subtask")) {
             Subtask s = (Subtask) task;
             return s.toString();
         }
-        return "Объект не распознан.";
+        return "Объект не распознан." + task.getClass().getCanonicalName();
     }
 
     // Метод получения объекта по индексу (любого объекта, в том числе и наследованного от Task)
@@ -77,10 +79,10 @@ public class TaskManager {
     // Метод получения объекта класса Task из коллекции по индексу
     // В озвращает ссылку на объект если найден, иначе null
     public Task getTaskById(Integer Id) {
-        Task record = getRecordBuId(Id);
+        Task record = taskList.get(Id);
         if (record == null) {
             return null;
-        } else if (!record.getClass().getCanonicalName().equals("Task")) {
+        } else if (!record.getClass().getCanonicalName().equals("tasks.Task")) {
             return null;
         }
         return record;
@@ -92,7 +94,7 @@ public class TaskManager {
         Task record = getRecordBuId(Id);
         if (record == null) {
             return null;
-        } else if (!record.getClass().getCanonicalName().equals("Epic")) {
+        } else if (!record.getClass().getCanonicalName().equals("tasks.Epic")) {
             return null;
         }
         return (Epic)record;
@@ -104,7 +106,7 @@ public class TaskManager {
         Task record = getRecordBuId(Id);
         if (record == null) {
             return null;
-        } else if (!record.getClass().getCanonicalName().equals("Subtask")) {
+        } else if (!record.getClass().getCanonicalName().equals("tasks.Subtask")) {
             return null;
         }
         return (Subtask)record;
@@ -123,7 +125,7 @@ public class TaskManager {
      *
      * @param id - идентификатор записи в списке менеджера задач
      */
-    public void removeTaskByID(Integer id) {
+   public void removeTaskByID(Integer id) {
         Task record = getRecordBuId(id);
         if (record == null) {
             return;
@@ -136,7 +138,7 @@ public class TaskManager {
                 // Удаляем все сабтаски эпика
                 taskList.remove(s.getID());
             }
-        } else if (record.getClass().getCanonicalName().equals("Subtask")) {
+        } else if (record.getClass().getCanonicalName().equals("tasks.Subtask")) {
             Subtask subtask = (Subtask) record;
             epic = subtask.getEpic();
             epic.removeSubtask(subtask); // удаляем подзадачу из списка эпика
@@ -149,13 +151,13 @@ public class TaskManager {
 
         switch (filter) {
             case TASK:
-                maket = "Task";
+                maket = "tasks.Task";
                 break;
             case EPIC:
-                maket = "Epic";
+                maket = "tasks.Epic";
                 break;
             case SUBTASK:
-                maket = "Subtask";
+                maket = "tasks.Subtask";
                 break;
             case ALL:
             default:
@@ -214,7 +216,7 @@ public class TaskManager {
         return getEpicById(Id).getSubtasks();
     }
 
-    public int getTaskNumber() {
+    public int getTaskListSize() {
         return taskList.size();
     }
 }
