@@ -5,27 +5,27 @@ import java.util.Objects;
 public class Task {
     private final String title;   // заголовок задачи не меняется в течении жизни
     private String description;
-    private int ID;
+    private int id;
     private TaskStatus status;
 
     public Task(String title, String description) {
         this.title = title;
         this.description = description;
-        ID = 0;
+        id = 0;
         status = TaskStatus.NEW;
     }
 
     public Task(String title) {
         this.title = title;
         this.description = "-";
-        ID = 0;
-        //      status = TaskStatus.NEW;
+        id = 0;
+        status = TaskStatus.NEW;
     }
 
     @Override
     public String toString() {
         return "Task{" +
-                "ID=" + ID +
+                "id=" + id +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
                 ", status=" + status +
@@ -37,7 +37,7 @@ public class Task {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return ID == task.ID && Objects.equals(title, task.title) && Objects.equals(description, task.description);
+        return id == task.id && Objects.equals(title, task.title) && Objects.equals(description, task.description);
     }
 
     @Override
@@ -51,7 +51,7 @@ public class Task {
         if (description != null) {
             hash = hash + description.hashCode();
         }
-        return hash + ID;
+        return hash + id;
     }
 
     // методчтения заголовка задачи
@@ -61,13 +61,13 @@ public class Task {
     }
 
     // метод получения идентификатора задачи
-    public int getID() {
-        return ID;
+    public int getId() {
+        return id;
     }
 
     // метод присвоения идентификатора задачи
-    public void setID(int ID) {
-        this.ID = ID;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getDescription() {

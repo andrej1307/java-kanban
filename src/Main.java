@@ -1,8 +1,7 @@
 /**
- * Программа демонстрации методов класса TaskManager
+ * Программа демонстрации рабботы методов класса TaskManager
  */
 import tasks.*;
-import java.util.ArrayList;
 
 public class Main {
     // создаем объект менеджера задач
@@ -11,115 +10,64 @@ public class Main {
     public static void main(String[] args) {
 
         // добавляем простую задачу
-        taskManager.addTask(new Task("Выпить кофе",
+        taskManager.addNewTask(new Task("Выпить кофе",
                 "Кофе с молоком, 1 ложка сахара."));
 
         // добавляем простую задачу
-        taskManager.addTask(new Task("Прочитать новости"));
+        taskManager.addNewTask(new Task("Прочитать новости"));
 
         // объект "Epic" нужен для привязки подзадач
         Epic epic = new Epic("Выполнить спринт №4 \"Практикума\".");
         // добавляем эпик
-        taskManager.addTask(epic);
+        taskManager.addNewEpic(epic);
 
-        Subtask subtask = new Subtask(epic, "Изучить теорию.",
-                "Изучить объекты и методы класса Object.");
-        subtask.setStatus(TaskStatus.DONE);
         // добавляем подзадачу к эпику
-        taskManager.addTask(subtask);
+        taskManager.addNewSubtask(new Subtask(epic.getId(),"Изучить теорию.",
+                "Изучить объекты и методы класса Object."));
 
-        subtask = new Subtask(epic, "подготовить итоговый проект.",
-                "Написать программу итогового проекта.");
-        subtask.setStatus(TaskStatus.IN_PROGRESS);
         // добавляем подзадачу к эпику
-        taskManager.addTask(subtask);
+        taskManager.addNewSubtask(new Subtask(epic.getId(), "подготовить итоговый проект.",
+                "Написать программу итогового проекта."));
 
         printAllTasks();
 
-        int id = 100002;
-        Task task = taskManager.getTaskById(id);
-        System.out.println("\nВыбираем задачу по ID="+ id + "\n" + task.toString());
-
-        id = 100003;
-        epic = taskManager.getEpicById(id);
-        System.out.println("Выбираем эпик по ID="+ id + "\n" + epic.toString());
-
-        id = 100005;
-        subtask = taskManager.getSubtaskById(id);
-        System.out.println("Выбираем подзадачу по ID=" + id + "\n" + subtask.toString());
-
-        taskManager.addTask(new Task("Задача №3"));
-        taskManager.addTask(new Task("Задача №4"));
-        taskManager.addTask(new Epic("Ещё один эпик"));
-        epic = taskManager.getEpicById(100008);
-        taskManager.addTask(new Subtask(epic, "подзадача №1."));
-        taskManager.addTask(new Subtask(epic, "подзадача №1."));
-
-        System.out.println("\nВсе задачи Task:");
-        ArrayList<Task> tasks = taskManager.getTaskList(TaskFilter.TASK);
-        for (Task t : tasks) {
-            System.out.println(t.toString());
-        }
-
-        System.out.println("\nВсе задачи Epic:");
-        tasks = taskManager.getTaskList(TaskFilter.EPIC);
-        for (Task t : tasks) {
-            System.out.println(((Epic)t).toString());
-        }
-
-        System.out.println("\nВсе подзадачи Subtask:");
-        tasks = taskManager.getTaskList(TaskFilter.SUBTASK);
-        for (Task t : tasks) {
-            System.out.println(((Subtask)t).toString());
-        }
-
-        id = 100008;
-        epic = taskManager.getEpicById(id);
-        System.out.println("\nВсе подзадачи эпика " + epic.getID());
-        ArrayList<Subtask> subtasks = epic.getSubtasks();
-        if(subtasks != null) {
-            for (Subtask s : subtasks) {
-                System.out.println(s.toString());
-            }
-        }
-
-        id = 100007;
-        task = taskManager.getTaskById(id);
-        System.out.println("\nВыбираем задачу по ID="+ id + "\n" + task.toString());
-        System.out.println("Обновляем выбранную задачу");
-        task.setDescription("эта задача обновлена.");
-        task.setStatus(TaskStatus.DONE);
-        taskManager.updateTask(task);
-        task = taskManager.getTaskById(id);
-        System.out.println(task.toString());
+        taskManager.getTaskById(1).setStatus(TaskStatus.DONE);
+        taskManager.getTaskById(2).setStatus(TaskStatus.IN_PROGRESS);
+        taskManager.getSubtasksById(1).setStatus(TaskStatus.DONE);
+        taskManager.getSubtasksById(1).setStatus(TaskStatus.IN_PROGRESS);
 
         printAllTasks();
 
-        id = 100009;
-        System.out.println("\nУдаляем задачу ID=" + id);
-        taskManager.removeTaskByID(id);
+        taskManager.addNewSubtask(new Subtask(1, "Устранить замечания к проекту"));
+
         printAllTasks();
 
-        System.out.println("\nУдаляем все Task!");
-        taskManager.removeAllTasks();
+        Subtask subtask = new Subtask(epic.getId(), "Повторить теорию \"спринт 4\".");
+        subtask.setId(1);
+        taskManager.updateSubtask(subtask);
+
         printAllTasks();
 
-        System.out.println("\nУдаляем все Subask!");
-        taskManager.removeAllSubtasks();
-        printAllTasks();
+        taskManager.removeTaskById(1);
+        taskManager.removeSubtaskById(2);
 
-        System.out.println("\nУдаляем все Epic!");
-        taskManager.removeAllEpics();
         printAllTasks();
 
     }
 
+    /**
+     * Вывод на экран списка всех задач
+     */
     public static void printAllTasks() {
-        System.out.println("\nВ списке задач " + taskManager.getTaskListSize() + " записей.");
-        ArrayList<String> taskTextList = taskManager.getStringsAllTasks(TaskFilter.ALL);
-        if (taskTextList == null) return;
-        for (String str : taskTextList) {
-            System.out.println(str);
+        System.out.println("\nВ списке задач " + taskManager.getNumberOfObjects() + " записей.");
+        for (Task t : taskManager.getTaskList()) {
+            System.out.println(t.toString());
+        }
+        for (Epic e : taskManager.getEpicList()) {
+            System.out.println(e.toString());
+        }
+        for (Subtask s : taskManager.getSubtaskList()) {
+            System.out.println(s.toString());
         }
     }
 
