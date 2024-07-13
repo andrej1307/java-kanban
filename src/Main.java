@@ -33,26 +33,38 @@ public class Main {
 
         taskManager.getTaskById(1).setStatus(TaskStatus.DONE);
         taskManager.getTaskById(2).setStatus(TaskStatus.IN_PROGRESS);
-        taskManager.getSubtasksById(1).setStatus(TaskStatus.DONE);
-        taskManager.getSubtasksById(1).setStatus(TaskStatus.IN_PROGRESS);
+
+        Subtask subtask = taskManager.getSubtasksById(4);
+        subtask.setStatus(TaskStatus.DONE);
+        taskManager.updateSubtask(subtask);
+
+        subtask = taskManager.getSubtasksById(5);
+        subtask.setStatus(TaskStatus.IN_PROGRESS);
+        taskManager.updateSubtask(subtask);
 
         printAllTasks();
 
-        taskManager.addNewSubtask(new Subtask(1, "Устранить замечания к проекту"));
+        taskManager.addNewSubtask(new Subtask(3, "Устранить замечания к проекту"));
 
         printAllTasks();
 
-        Subtask subtask = new Subtask(epic.getId(), "Повторить теорию \"спринт 4\".");
-        subtask.setId(1);
+        subtask = new Subtask(epic.getId(), "Повторить теорию \"спринт 4\".");
+        subtask.setId(4);
         taskManager.updateSubtask(subtask);
 
         printAllTasks();
 
         taskManager.removeTaskById(1);
-        taskManager.removeSubtaskById(2);
+        taskManager.removeSubtaskById(5);
 
         printAllTasks();
 
+        subtask.setStatus(TaskStatus.DONE);
+        taskManager.updateSubtask(subtask);
+        printAllTasks();
+
+        taskManager.removeAllSubtasks();
+        printAllTasks();
     }
 
     /**

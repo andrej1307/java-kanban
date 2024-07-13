@@ -7,9 +7,7 @@ public class TaskManager {
     private HashMap<Integer, Task> taskList;
     private HashMap<Integer, Epic> epicList;
     private HashMap<Integer, Subtask> subtaskList;
-    private Integer idTask = 0;
-    private Integer idEpic = 0;
-    private Integer idSubtask = 0;
+    private Integer idMain = 0;
 
     // Инициализируем переменные в конструкторе
     public TaskManager() {
@@ -20,23 +18,23 @@ public class TaskManager {
 
     // Метод добавления новой задачи
     public void addNewTask(Task newTask) {
-        Integer id = ++idTask;
+        Integer id = ++idMain;
         newTask.setId(id);
         taskList.put(id, newTask);
     }
 
     // Метод добавления нового эпика
     public void addNewEpic(Epic newEpic) {
-        Integer id = ++idEpic;
+        Integer id = ++idMain;
         newEpic.setId(id);
         epicList.put(id, newEpic);
     }
 
     // Метод добавления новоq подзадачи
-    synchronized public void addNewSubtask(Subtask newSubtask) {
+    public void addNewSubtask(Subtask newSubtask) {
         Epic epic = getEpicById(newSubtask.getEpicId());
         if (epic == null) { return; }
-        Integer id = ++idSubtask;
+        Integer id = ++idMain;
         newSubtask.setId(id);
         subtaskList.put(id, newSubtask);
         epic.addSubtask(newSubtask.getId());
@@ -71,7 +69,7 @@ public class TaskManager {
     }
 
     // Метод обновления эпика
-    public int updateTask(Epic newEpic) {
+    public int updateEpic(Epic newEpic) {
         int id = newEpic.getId();
         if (!epicList.keySet().contains(id)) { return 0; }
         newEpic.reloadSubtakList(getEpicById(id).getSubtasks());
@@ -104,9 +102,13 @@ public class TaskManager {
      * Пересчет статуса эпика по указанному идентификатору
      * @param epicID
      */
-    public void calculateStatusEpic(Integer epicID) {
+    private void calculateStatusEpic(Integer epicID) {
         if (!epicList.keySet().contains(epicID)) { return; }
         Epic epic = getEpicById(epicID);
+        if (epic.getSubtasks().isEmpty()) {
+            epic.setStatus(TaskStatus.NEW);
+            return;
+        }
         int countNew=0;
         int countInProgress=0;
         int countDone=0;

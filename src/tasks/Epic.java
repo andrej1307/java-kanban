@@ -57,6 +57,7 @@ public class Epic  extends Task {
 
     public void removeAllSubtasks() {
         subtaskList.clear();
+        setStatus(TaskStatus.NEW);
     }
 
     // метод переписывания списка подзадач, массивом новых идентификаторов
