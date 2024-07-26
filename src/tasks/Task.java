@@ -22,6 +22,14 @@ public class Task {
         status = TaskStatus.NEW;
     }
 
+    // конструктор копирования
+    public Task(Task original) {
+        title = original.getTitle();
+        description = original.getDescription();
+        id = original.getId();
+        status = original.getStatus();
+    }
+
     @Override
     public String toString() {
         return "Task{" +

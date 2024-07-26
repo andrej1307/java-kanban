@@ -17,6 +17,12 @@ public class Epic  extends Task {
         subtaskList = new ArrayList<>();
     }
 
+    // Конструктор копирования объекта
+    public Epic(Epic original) {
+        super(original);
+        subtaskList = new ArrayList<>(original.getSubtasks());
+    }
+
     // Переопределяем метод отображения объекта
     @Override
     public String toString() {
@@ -37,18 +43,14 @@ public class Epic  extends Task {
     // метод добавления идентификатора подзадачи в список эпика
     public void addSubtask(Integer subtaskId) {
         int index = subtaskList.indexOf(subtaskId);
-        if (index >= 0) return;
+        // Если идентификатор уже существует или равен идентификатору эпика
+        // выходим без добавления задачи
+        if ((index >= 0) || (subtaskId == getId())) return;
+
         subtaskList.add(subtaskId);
     }
 
     // Удаление идентификатора подзадачи из списка эпика
-    public void removeSubtask(Subtask subtaskid) {
-        int index = subtaskList.indexOf(subtaskid);
-        if (index >= 0) {
-            subtaskList.remove(index);
-        }
-    }
-
     public void  removeSubtask(Integer subtaskId) {
         int index = subtaskList.indexOf(subtaskId);
         if (index < 0) { return; }

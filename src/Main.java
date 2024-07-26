@@ -4,82 +4,95 @@
 import tasks.*;
 
 public class Main {
-    // создаем объект менеджера задач
-    public static TaskManager taskManager = new TaskManager();
+    // создаем объект менеджера задач при помощи утилитарного класса
+    public static TaskManager manager = Managers.getDefault();
 
     public static void main(String[] args) {
 
         // добавляем простую задачу
-        taskManager.addNewTask(new Task("Выпить кофе",
+        int taskId = manager.addNewTask(new Task("Выпить кофе",
                 "Кофе с молоком, 1 ложка сахара."));
 
         // добавляем простую задачу
-        taskManager.addNewTask(new Task("Прочитать новости"));
+        taskId = manager.addNewTask(new Task("Прочитать новости"));
 
-        // объект "Epic" нужен для привязки подзадач
-        Epic epic = new Epic("Выполнить спринт №4 \"Практикума\".");
         // добавляем эпик
-        taskManager.addNewEpic(epic);
+        int epicId = manager.addNewEpic(new Epic("Выполнить спринт №4 \"Практикума\"."));
 
         // добавляем подзадачу к эпику
-        taskManager.addNewSubtask(new Subtask(epic.getId(),"Изучить теорию.",
+        int subtaskId = manager.addNewSubtask(new Subtask(epicId,"Изучить теорию.",
                 "Изучить объекты и методы класса Object."));
 
         // добавляем подзадачу к эпику
-        taskManager.addNewSubtask(new Subtask(epic.getId(), "подготовить итоговый проект.",
+        subtaskId = manager.addNewSubtask(new Subtask(epicId, "подготовить итоговый проект.",
                 "Написать программу итогового проекта."));
 
-        printAllTasks();
+        printAllTasks(manager);
 
-        taskManager.getTaskById(1).setStatus(TaskStatus.DONE);
-        taskManager.getTaskById(2).setStatus(TaskStatus.IN_PROGRESS);
+        manager.getTask(0).setStatus(TaskStatus.DONE);
+        Task task = manager.getTask(0);
+        manager.getTask(1).setStatus(TaskStatus.IN_PROGRESS);
+        task = manager.getTask(1);
 
-        Subtask subtask = taskManager.getSubtasksById(4);
+        System.out.println("\nПоменяли статус у двух задач.");
+        printAllTasks(manager);
+
+        Subtask subtask = manager.getSubtasks(3);
         subtask.setStatus(TaskStatus.DONE);
-        taskManager.updateSubtask(subtask);
+        manager.updateSubtask(subtask);
+        subtask = manager.getSubtasks(3);
 
-        subtask = taskManager.getSubtasksById(5);
+        subtask = manager.getSubtasks(4);
         subtask.setStatus(TaskStatus.IN_PROGRESS);
-        taskManager.updateSubtask(subtask);
+        manager.updateSubtask(subtask);
+        subtask = manager.getSubtasks(4);
 
-        printAllTasks();
+        System.out.println("\nПоменяли статус у подзадач 3, 4.");
+        printAllTasks(manager);
 
-        taskManager.addNewSubtask(new Subtask(3, "Устранить замечания к проекту"));
+        subtaskId = manager.addNewSubtask(new Subtask(2, "Устранить замечания к проекту"));
 
-        printAllTasks();
+        System.out.println("\nДобавили 1 подзадачу");
+        printAllTasks(manager);
 
-        subtask = new Subtask(epic.getId(), "Повторить теорию \"спринт 4\".");
-        subtask.setId(4);
-        taskManager.updateSubtask(subtask);
+        manager.removeTask(0);
+        manager.removeSubtask(4);
 
-        printAllTasks();
+        System.out.println("\nУдалили 1 задачу и 1 подзадачу");
+        printAllTasks(manager);
 
-        taskManager.removeTaskById(1);
-        taskManager.removeSubtaskById(5);
+        Epic e = manager.getEpic(2);
 
-        printAllTasks();
+        manager.removeAllSubtasks();
+        e = manager.getEpic(2);
 
-        subtask.setStatus(TaskStatus.DONE);
-        taskManager.updateSubtask(subtask);
-        printAllTasks();
-
-        taskManager.removeAllSubtasks();
-        printAllTasks();
+        System.out.println("\nУдалили все подзадачи");
+        printAllTasks(manager);
     }
 
     /**
      * Вывод на экран списка всех задач
      */
-    public static void printAllTasks() {
-        System.out.println("\nВ списке задач " + taskManager.getNumberOfObjects() + " записей.");
-        for (Task t : taskManager.getTaskList()) {
+    public static void printAllTasks(TaskManager manager) {
+        System.out.println("\nВ списке задач " + manager.getNumberOfObjects() + " записей.");
+        System.out.println("Задачи:");
+        for (Task t : manager.getTaskList()) {
             System.out.println(t.toString());
         }
-        for (Epic e : taskManager.getEpicList()) {
+        System.out.println("Эпики:");
+        for (Epic e : manager.getEpicList()) {
             System.out.println(e.toString());
+            for (Subtask s : manager.getSubtasksByEpic(e.getId())) {
+                System.out.println("-->" + s.toString());
+            }
         }
-        for (Subtask s : taskManager.getSubtaskList()) {
+        System.out.println("Подзадачи:");
+        for (Subtask s : manager.getSubtaskList()) {
             System.out.println(s.toString());
+        }
+        System.out.println("История:");
+        for (Task task : manager.getHistory()) {
+            System.out.println(task.toString());
         }
     }
 
