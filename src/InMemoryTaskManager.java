@@ -2,12 +2,13 @@ import tasks.*;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.HashMap;
 
 public class InMemoryTaskManager implements TaskManager {
-    private HashMap<Integer, Task> taskList;
-    private HashMap<Integer, Epic> epicList;
-    private HashMap<Integer, Subtask> subtaskList;
+    private final Map<Integer, Task> taskList;
+    private final Map<Integer, Epic> epicList;
+    private final Map<Integer, Subtask> subtaskList;
     private Integer idMain = 0;
     private HistoryManager viewHistory = Managers.getDefaultHistory();
 
@@ -187,21 +188,18 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public ArrayList<Task> getTaskList() {
-        ArrayList<Task> tasks = new ArrayList<>(taskList.values());
-        return tasks;
+    public List<Task> getTaskList() {
+        return new ArrayList<>(taskList.values());
     }
 
     @Override
-    public ArrayList<Epic> getEpicList() {
-        ArrayList<Epic> epics = new ArrayList<>(epicList.values());
-        return epics;
+    public List<Epic> getEpicList() {
+        return new ArrayList<>(epicList.values());
     }
 
     @Override
     public ArrayList<Subtask> getSubtaskList() {
-        ArrayList<Subtask> subtasks = new ArrayList<>(subtaskList.values());
-        return subtasks;
+        return new ArrayList<>(subtaskList.values());
     }
 
     // Удаление всех объектов класса Task
@@ -229,12 +227,12 @@ public class InMemoryTaskManager implements TaskManager {
     /**
      * Получение списка всех подзадач длля заданного эпика
      * @param epicId - идентификатор эпика
-     * @return       - ArrayList<Subtask> список подзадач
+     * @return
      */
     @Override
-    public ArrayList<Subtask> getSubtasksByEpic(Integer epicId) {
+    public List<Subtask> getSubtasksByEpic(Integer epicId) {
         Epic epic = epicList.get(epicId);
-        ArrayList<Subtask> subtasks = new ArrayList<>();
+        List<Subtask> subtasks = new ArrayList<>();
         for (Integer subtaskId : epic.getSubtasks()) {
             subtasks.add(subtaskList.get(subtaskId));
         }
@@ -242,9 +240,10 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     /**
-     * Метод примотра использованных задач
+     * Метод просмотра использованных задач
      * @return
      */
+    @Override
     public List<Task> getHistory() {
         return viewHistory.getHistory();
     }

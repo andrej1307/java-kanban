@@ -1,9 +1,10 @@
 package tasks;
 
+import java.util.List;
 import java.util.ArrayList;
 
 public class Epic  extends Task {
-    private ArrayList<Integer> subtaskList;
+    private List<Integer> subtaskList;
 
     // конструктор с параметрами "имя", "описание"
     public Epic(String title, String description) {
@@ -37,7 +38,7 @@ public class Epic  extends Task {
 
     // получение списка идентификаторов подзадач
     public ArrayList<Integer> getSubtasks() {
-        return subtaskList;
+        return new ArrayList<>(subtaskList);
     }
 
     // метод добавления идентификатора подзадачи в список эпика

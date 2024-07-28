@@ -1,13 +1,13 @@
 import tasks.*;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class InMemoryHistoryManager implements HistoryManager {
     private static final int HISTORY_MAX_SIZE = 10;
-    private List<Task> history;
+    private final List<Task> history;
 
     public InMemoryHistoryManager() {
-        history = new ArrayList<>(HISTORY_MAX_SIZE);
+        history = new LinkedList<>();
     }
 
     /**
@@ -46,7 +46,7 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public List<Task> getHistory() {
-        return history;
+        return new LinkedList<>(history);
     }
 
     @Override

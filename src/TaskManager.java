@@ -36,11 +36,11 @@ public interface TaskManager {
 
     void removeSubtask(Integer subtaskId);
 
-    ArrayList<Task> getTaskList();
+    List<Task> getTaskList();
 
-    ArrayList<Epic> getEpicList();
+    List<Epic> getEpicList();
 
-    ArrayList<Subtask> getSubtaskList();
+    List<Subtask> getSubtaskList();
 
     // Удаление всех объектов класса Task
     void removeAllTasks();
@@ -51,7 +51,7 @@ public interface TaskManager {
     // Удаление всех объектов класса Subtask
     void removeAllSubtasks();
 
-    ArrayList<Subtask> getSubtasksByEpic(Integer epicId);
+    List<Subtask> getSubtasksByEpic(Integer epicId);
 
     // определение общего числа задач всех типов в менеджере
     int getNumberOfObjects();
