@@ -1,7 +1,5 @@
 package tasks;
 
-import java.util.Objects;
-
 public class Task {
     private final String title;   // заголовок задачи не меняется в течении жизни
     private String description;
@@ -45,7 +43,7 @@ public class Task {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return id == task.id && Objects.equals(title, task.title) && Objects.equals(description, task.description);
+        return id == task.id;
     }
 
     @Override
