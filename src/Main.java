@@ -68,6 +68,10 @@ public class Main {
 
         System.out.println("\nУдалили все подзадачи");
         printAllTasks(manager);
+
+        System.out.println("\n--");
+        task = manager.getTask(1);
+        printAllTasks(manager);
     }
 
     /**
