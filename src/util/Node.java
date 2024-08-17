@@ -38,4 +38,10 @@ public class Node<E> {
     public Node<E> getPrev() {
         return prev;
     }
+
+    public void toFree() {
+        prev = null;
+        next = null;
+        data = null;
+    }
 }

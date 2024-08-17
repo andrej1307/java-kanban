@@ -48,7 +48,6 @@ public class SimpleLinkedList<T> implements Iterable<T> {
      * @param element - новый элемент
      */
     public void addLast(T element) {
-        // Реализуйте метод
         final Node<T> oldTail = tail;
         final Node<T> newNode = new Node<>(oldTail, element, null);
         tail = newNode;
@@ -126,7 +125,24 @@ public class SimpleLinkedList<T> implements Iterable<T> {
             tail = prevNode;
         }
 
+        node.toFree();
         size--;
+    }
+
+    /**
+     * Добавление в конец списка подготовленного узла
+     * @param node - узел для добавления
+     */
+    public void addLastNode(Node<T> node) {
+        final Node<T> oldTail = tail;
+        tail = node;
+        tail.setPrev(oldTail);
+        if (oldTail == null) {
+            head = node;
+        } else {
+            oldTail.setNext(node);
+        }
+        size++;
     }
 
     public void removeFirst(){
@@ -137,10 +153,6 @@ public class SimpleLinkedList<T> implements Iterable<T> {
         remove(tail);
     }
 
-    public boolean isEmpty() {
-        return size == 0;
-    }
-
     /**
      * очистка содержимого списка
      */
@@ -149,4 +161,9 @@ public class SimpleLinkedList<T> implements Iterable<T> {
             remove(tail);
         }
     }
+
+    public boolean isEmpty() {
+        return size == 0;
+    }
+
 }
