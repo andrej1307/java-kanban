@@ -5,7 +5,6 @@ import util.Node;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.LinkedList;
 
 public class InMemoryHistoryManager implements HistoryManager {
     private final SimpleLinkedList<Task> historyList;
