@@ -1,5 +1,7 @@
 package util;
 
+import java.util.Objects;
+
 /**
  * Класс узла связанного списка
  * @param <E> - тип элемента данных узла
@@ -43,5 +45,18 @@ public class Node<E> {
         prev = null;
         next = null;
         data = null;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Node<?> node = (Node<?>) o;
+        return Objects.equals(data, node.data) && Objects.equals(next, node.next) && Objects.equals(prev, node.prev);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(data, next, prev);
     }
 }

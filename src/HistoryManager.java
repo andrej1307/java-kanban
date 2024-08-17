@@ -2,14 +2,9 @@ import tasks.*;
 import java.util.List;
 
 public interface HistoryManager {
-    // метод добавления события в историю
     void add(Task task);
-    void add(Epic epic);
-    void add(Subtask subtask);
-
-    // метод получения списка событий мстории
+    void remove(int id);
     List<Task> getHistory();
 
-    // метод очистки истории
-    void clear();
+    public void clear();
 }

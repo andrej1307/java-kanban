@@ -107,7 +107,7 @@ public class SimpleLinkedList<T> implements Iterable<T> {
      * Удаление узла из связанного списка
      * @param node - узел для удаления
      */
-    public void remove(Node<T> node) {
+    public void removeNode(Node<T> node) {
         if (node == null || size == 0) return;
 
         final Node<T> prevNode = node.getPrev();
@@ -146,11 +146,11 @@ public class SimpleLinkedList<T> implements Iterable<T> {
     }
 
     public void removeFirst(){
-        remove(head);
+        removeNode(head);
     }
 
     public void removeLast(){
-        remove(tail);
+        removeNode(tail);
     }
 
     /**
@@ -158,7 +158,7 @@ public class SimpleLinkedList<T> implements Iterable<T> {
      */
     public void clear() {
         while (size != 0) {
-            remove(tail);
+            removeNode(tail);
         }
     }
 
