@@ -1,9 +1,11 @@
 package util;
-import java.util.NoSuchElementException;
+
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * Класс реализации двунаправленного связанного списка
+ *
  * @param <T> - тип элементов списка
  */
 public class SimpleLinkedList<T> implements Iterable<T> {
@@ -17,6 +19,7 @@ public class SimpleLinkedList<T> implements Iterable<T> {
 
     /**
      * Добавление нового элемента в начало списка
+     *
      * @param element - новый элемент
      */
     public void addFirst(T element) {
@@ -25,8 +28,7 @@ public class SimpleLinkedList<T> implements Iterable<T> {
         head = newNode;
         if (oldHead == null) {
             tail = newNode;
-        }
-        else {
+        } else {
             oldHead.setPrev(newNode);
         }
         size++;
@@ -34,6 +36,7 @@ public class SimpleLinkedList<T> implements Iterable<T> {
 
     /**
      * чтение первого элемента списка
+     *
      * @return - первый элемент списка
      */
     public T getFirst() {
@@ -45,6 +48,7 @@ public class SimpleLinkedList<T> implements Iterable<T> {
 
     /**
      * добавление элемента в конец списка
+     *
      * @param element - новый элемент
      */
     public void addLast(T element) {
@@ -61,6 +65,7 @@ public class SimpleLinkedList<T> implements Iterable<T> {
 
     /**
      * Чтение последнего элемента списка
+     *
      * @return - последний элеент
      */
     public T getLast() {
@@ -73,6 +78,7 @@ public class SimpleLinkedList<T> implements Iterable<T> {
 
     /**
      * Чтение размера списка
+     *
      * @return - число элементов в списке
      */
     public int size() {
@@ -81,6 +87,7 @@ public class SimpleLinkedList<T> implements Iterable<T> {
 
     /**
      * Получение ссылки на начало списка
+     *
      * @return - ссылка на первый узел связанного списка
      */
     public Node<T> getHead() {
@@ -89,6 +96,7 @@ public class SimpleLinkedList<T> implements Iterable<T> {
 
     /**
      * Получение ссылки на конец списка
+     *
      * @return - ссылка на конечный  узел связанного списка
      */
     public Node<T> getTail() {
@@ -97,6 +105,7 @@ public class SimpleLinkedList<T> implements Iterable<T> {
 
     /**
      * Создание итератора для перебора элементов списка
+     *
      * @return - итератор
      */
     public Iterator<T> iterator() {
@@ -105,6 +114,7 @@ public class SimpleLinkedList<T> implements Iterable<T> {
 
     /**
      * Удаление узла из связанного списка
+     *
      * @param node - узел для удаления
      */
     public void removeNode(Node<T> node) {
@@ -131,6 +141,7 @@ public class SimpleLinkedList<T> implements Iterable<T> {
 
     /**
      * Добавление в конец списка подготовленного узла
+     *
      * @param node - узел для добавления
      */
     public void addLastNode(Node<T> node) {
@@ -145,11 +156,11 @@ public class SimpleLinkedList<T> implements Iterable<T> {
         size++;
     }
 
-    public void removeFirst(){
+    public void removeFirst() {
         removeNode(head);
     }
 
-    public void removeLast(){
+    public void removeLast() {
         removeNode(tail);
     }
 

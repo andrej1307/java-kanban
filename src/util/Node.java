@@ -4,6 +4,7 @@ import java.util.Objects;
 
 /**
  * Класс узла связанного списка
+ *
  * @param <E> - тип элемента данных узла
  */
 public class Node<E> {

@@ -12,6 +12,7 @@ public class SimpleListIterator<T> implements Iterator<T> {
 
     /**
      * Проверка наличия данных в списке
+     *
      * @return - возвращает false если данных нет
      */
     public boolean hasNext() {
@@ -20,6 +21,7 @@ public class SimpleListIterator<T> implements Iterator<T> {
 
     /**
      * Чтение очередного элемента
+     *
      * @return - элемент данных
      */
     public T next() {

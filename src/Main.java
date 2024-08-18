@@ -1,4 +1,7 @@
-import tasks.*;
+import tasks.Epic;
+import tasks.Subtask;
+import tasks.Task;
+import tasks.TaskStatus;
 
 public class Main {
     // создаем объект менеджера задач при помощи утилитарного класса
@@ -100,6 +103,7 @@ public class Main {
 
     /**
      * Распечатка истории обращения к задачам
+     *
      * @param manager - менеджер задач
      */
     public static void printHistory(TaskManager manager) {

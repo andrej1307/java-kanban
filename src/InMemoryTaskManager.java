@@ -1,9 +1,12 @@
-import tasks.*;
+import tasks.Epic;
+import tasks.Subtask;
+import tasks.Task;
+import tasks.TaskStatus;
 
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class InMemoryTaskManager implements TaskManager {
     private final Map<Integer, Task> taskList;
@@ -22,7 +25,9 @@ public class InMemoryTaskManager implements TaskManager {
     // Метод добавления новой задачи
     @Override
     public int addNewTask(Task newTask) {
-        if (newTask == null) { return -1; }
+        if (newTask == null) {
+            return -1;
+        }
         Integer id = idMain++;
         newTask.setId(id);
         taskList.put(id, newTask);
@@ -32,7 +37,9 @@ public class InMemoryTaskManager implements TaskManager {
     // Метод добавления нового эпика
     @Override
     public int addNewEpic(Epic newEpic) {
-        if (newEpic == null) { return -1; }
+        if (newEpic == null) {
+            return -1;
+        }
         Integer id = idMain++;
         newEpic.setId(id);
         epicList.put(id, newEpic);
@@ -42,9 +49,13 @@ public class InMemoryTaskManager implements TaskManager {
     // Метод добавления новой подзадачи
     @Override
     public int addNewSubtask(Subtask newSubtask) {
-        if (newSubtask == null) { return -1; }
+        if (newSubtask == null) {
+            return -1;
+        }
         Epic epic = epicList.get(newSubtask.getEpicId());
-        if (epic == null) { return -2;}
+        if (epic == null) {
+            return -2;
+        }
         Integer id = idMain++;
         newSubtask.setId(id);
         subtaskList.put(id, newSubtask);
@@ -74,6 +85,7 @@ public class InMemoryTaskManager implements TaskManager {
         viewHistory.add(epic);
         return epic;
     }
+
     // Метод получения подзадачи по индексу
     @Override
     public Subtask getSubtasks(Integer id) {
@@ -86,7 +98,9 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public int updateTask(Task task) {
         int id = task.getId();
-        if (!taskList.containsKey(id)) { return -1; }
+        if (!taskList.containsKey(id)) {
+            return -1;
+        }
         taskList.put(id, task);
         return id;
     }
@@ -95,7 +109,9 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public int updateEpic(Epic newEpic) {
         int id = newEpic.getId();
-        if (!epicList.containsKey(id)) { return -1; }
+        if (!epicList.containsKey(id)) {
+            return -1;
+        }
         newEpic.reloadSubtakList(getEpic(id).getSubtasks());
         epicList.put(id, newEpic);
         setStatusEpic(id);
@@ -107,15 +123,20 @@ public class InMemoryTaskManager implements TaskManager {
      * проверяем существования подзадачи с указанным идентификатором
      * и существование соответствующего эпика. Если не найдены, то возвращаем  код меньше 0.
      * Если и эпик и подзадача существуют заменяем объект подзадачи на новый
-     * @param newSubtask  - идентификатор объекта, содержащий новую информацию
+     *
+     * @param newSubtask - идентификатор объекта, содержащий новую информацию
      * @return - id обновленно подзадачи, или меньше нуля если произошла ошибка
      */
     @Override
     public int updateSubtask(Subtask newSubtask) {
         int id = newSubtask.getId();
-        if (!subtaskList.containsKey(id)) { return -1; }
+        if (!subtaskList.containsKey(id)) {
+            return -1;
+        }
         int epicId = newSubtask.getEpicId();
-        if (!epicList.containsKey(epicId)) { return -2; }
+        if (!epicList.containsKey(epicId)) {
+            return -2;
+        }
         subtaskList.put(id, newSubtask);
         setStatusEpic(epicId);
         return id;
@@ -123,23 +144,32 @@ public class InMemoryTaskManager implements TaskManager {
 
     /**
      * Пересчет статуса эпика по указанному идентификатору
+     *
      * @param epicId- идентификатор объекта, содержащий новую информацию
      */
     private void setStatusEpic(Integer epicId) {
-        if (!epicList.containsKey(epicId)) { return; }
+        if (!epicList.containsKey(epicId)) {
+            return;
+        }
         Epic epic = epicList.get(epicId);
         if (epic.getSubtasks().isEmpty()) {
             epic.setStatus(TaskStatus.NEW);
             return;
         }
-        int countNew=0;
-        int countInProgress=0;
-        int countDone=0;
-        for (Integer idSubtask: epic.getSubtasks()) {
+        int countNew = 0;
+        int countInProgress = 0;
+        int countDone = 0;
+        for (Integer idSubtask : epic.getSubtasks()) {
             TaskStatus status = subtaskList.get(idSubtask).getStatus();
-            if (status == TaskStatus.NEW) { countNew++; }
-            if (status == TaskStatus.IN_PROGRESS) { countInProgress++; }
-            if (status == TaskStatus.DONE) { countDone++; }
+            if (status == TaskStatus.NEW) {
+                countNew++;
+            }
+            if (status == TaskStatus.IN_PROGRESS) {
+                countInProgress++;
+            }
+            if (status == TaskStatus.DONE) {
+                countDone++;
+            }
         }
 
         if (countNew > 0 && countInProgress == 0 && countDone == 0) {
@@ -164,11 +194,14 @@ public class InMemoryTaskManager implements TaskManager {
 
     /**
      * Удаление эпика и всех связанных с ним подзадач
+     *
      * @param epicId- идентификатор объекта
      */
     @Override
     public void removeEpic(Integer epicId) {
-        if (!epicList.containsKey(epicId)) { return; }
+        if (!epicList.containsKey(epicId)) {
+            return;
+        }
         for (Integer idSubtask : epicList.get(epicId).getSubtasks()) {
             subtaskList.remove(idSubtask);
             viewHistory.remove(idSubtask);
@@ -181,6 +214,7 @@ public class InMemoryTaskManager implements TaskManager {
      * Удаление подзадачи по идентификатору
      * Удаляем предварительно из спика соответствующего эпика
      * и из общего списка позадач.
+     *
      * @param subtaskId - идентификатор подзадачи
      */
     @Override
@@ -231,6 +265,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     /**
      * Получение списка всех подзадач длля заданного эпика
+     *
      * @param epicId - идентификатор эпика
      * @return - список подзадач
      */
@@ -246,6 +281,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     /**
      * Метод просмотра использованных задач
+     *
      * @return - возвращает список использованных объектов
      */
     @Override

@@ -1,6 +1,6 @@
-import tasks.*;
-import util.SimpleLinkedList;
+import tasks.Task;
 import util.Node;
+import util.SimpleLinkedList;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,7 +8,7 @@ import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
     private final SimpleLinkedList<Task> historyList;
-    private final HashMap<Integer,Node<Task>> historyMap;
+    private final HashMap<Integer, Node<Task>> historyMap;
 
     public InMemoryHistoryManager() {
         historyList = new SimpleLinkedList<>();
@@ -24,6 +24,7 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     /**
      * добавление задачи в конец связанного списка истории просмотров
+     *
      * @param task - задача для добавления или обновления
      */
     @Override
@@ -40,6 +41,7 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     /**
      * Удаление задачи из списка истори
+     *
      * @param taskId - идентификатор задачи
      */
     public void remove(int taskId) {
@@ -51,6 +53,7 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     /**
      * Чтение списка истории чтения задач
+     *
      * @return - список просмоотренных задач
      */
     @Override
