@@ -3,11 +3,11 @@ package util;
 import java.util.Iterator;
 
 public class SimpleListIterator<T> implements Iterator<T> {
-    Node<T> current;
+    private Node<T> current;
 
     // инициализация итератора
-    public SimpleListIterator(SimpleLinkedList<T> list) {
-        current = list.getHead();
+    public SimpleListIterator(Node<T> node) {
+        current = node;
     }
 
     /**
@@ -15,6 +15,7 @@ public class SimpleListIterator<T> implements Iterator<T> {
      *
      * @return - возвращает false если данных нет
      */
+    @Override
     public boolean hasNext() {
         return current != null;
     }
@@ -24,6 +25,7 @@ public class SimpleListIterator<T> implements Iterator<T> {
      *
      * @return - элемент данных
      */
+    @Override
     public T next() {
         T data = current.getData();
         current = current.getNext();
@@ -33,6 +35,7 @@ public class SimpleListIterator<T> implements Iterator<T> {
     /**
      * Не поддерживаемая операция - формируем исключение
      */
+    @Override
     public void remove() {
         throw new UnsupportedOperationException();
     }

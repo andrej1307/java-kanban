@@ -42,12 +42,6 @@ public class Node<E> {
         return prev;
     }
 
-    public void toFree() {
-        prev = null;
-        next = null;
-        data = null;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

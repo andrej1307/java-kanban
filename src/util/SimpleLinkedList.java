@@ -86,30 +86,12 @@ public class SimpleLinkedList<T> implements Iterable<T> {
     }
 
     /**
-     * Получение ссылки на начало списка
-     *
-     * @return - ссылка на первый узел связанного списка
-     */
-    public Node<T> getHead() {
-        return head;
-    }
-
-    /**
-     * Получение ссылки на конец списка
-     *
-     * @return - ссылка на конечный  узел связанного списка
-     */
-    public Node<T> getTail() {
-        return tail;
-    }
-
-    /**
      * Создание итератора для перебора элементов списка
      *
      * @return - итератор
      */
     public Iterator<T> iterator() {
-        return new SimpleListIterator<>(this);
+        return new SimpleListIterator<>(head);
     }
 
     /**
@@ -135,7 +117,6 @@ public class SimpleLinkedList<T> implements Iterable<T> {
             tail = prevNode;
         }
 
-        node.toFree();
         size--;
     }
 

@@ -77,6 +77,30 @@ public class Main {
         printAllTasks(manager);
         printHistory(manager);
 
+        System.out.println("\nСнов добавляем подзадачи к эпику.");
+        subtaskId = manager.addNewSubtask(new Subtask(6, "------1"));
+        System.out.println(manager.getSubtasks(subtaskId).toString());
+
+        subtaskId = manager.addNewSubtask(new Subtask(6, "------2"));
+        System.out.println(manager.getSubtasks(subtaskId).toString());
+
+        subtaskId = manager.addNewSubtask(new Subtask(6, "------3"));
+        System.out.println(manager.getSubtasks(subtaskId).toString());
+
+        System.out.println("\nДобавили подзадачи к эпику : " + manager.getEpic(6).toString());
+        printHistory(manager);
+
+        // добавляем эпик
+        epicId = manager.addNewEpic(new Epic("Еще один эпик."));
+        System.out.println("\nДобавили эпик : " + manager.getEpic(epicId));
+        printAllTasks(manager);
+        printHistory(manager);
+
+        System.out.println("\nУдаляем все эпики.");
+        manager.removeAllEpics();
+        printAllTasks(manager);
+        printHistory(manager);
+
     }
 
     /**

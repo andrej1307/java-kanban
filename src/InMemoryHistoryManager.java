@@ -31,7 +31,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     public void add(Task task) {
         if (task == null) return;
         int taskId = task.getId();
-        Node<Task> newNode = new Node(historyList.getTail(), new Task(task), null);
+        Node<Task> newNode = new Node(null, new Task(task), null);
         if (historyMap.containsKey(taskId)) {
             historyList.removeNode(historyMap.get(taskId));
         }

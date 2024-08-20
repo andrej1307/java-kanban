@@ -244,12 +244,21 @@ public class InMemoryTaskManager implements TaskManager {
     // Удаление всех объектов класса Task
     @Override
     public void removeAllTasks() {
+        for(Task task : taskList.values()) {
+            viewHistory.remove(task.getId());
+        }
         taskList.clear();
     }
 
     // Удаление всех объектов класса Epic
     @Override
     public void removeAllEpics() {
+        for (Epic epic : epicList.values()) {
+            for (int subtaskId : epic.getSubtasks()) {
+                viewHistory.remove(subtaskId);
+            }
+            viewHistory.remove(epic.getId());
+        }
         epicList.clear();
         subtaskList.clear();
     }
@@ -259,6 +268,9 @@ public class InMemoryTaskManager implements TaskManager {
     public void removeAllSubtasks() {
         for (Epic epic : getEpicList()) {
             epic.removeAllSubtasks();
+        }
+        for (Subtask subtask : subtaskList.values()) {
+            viewHistory.remove(subtask.getId());
         }
         subtaskList.clear();
     }
