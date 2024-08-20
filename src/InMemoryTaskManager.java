@@ -244,7 +244,7 @@ public class InMemoryTaskManager implements TaskManager {
     // Удаление всех объектов класса Task
     @Override
     public void removeAllTasks() {
-        for(Task task : taskList.values()) {
+        for (Task task : taskList.values()) {
             viewHistory.remove(task.getId());
         }
         taskList.clear();
