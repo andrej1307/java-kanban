@@ -1,10 +1,7 @@
 
-/**
- * Класс описания подзадачи.
- */
 package tasks;
 
-public class Subtask extends Task  {
+public class Subtask extends Task {
     private Integer epicId;
 
     // При вызове конструктора указание объекта задачи "эпик" обязательно
@@ -22,13 +19,14 @@ public class Subtask extends Task  {
         super(original);
         this.epicId = original.getEpicId();
     }
+
     @Override
     public String toString() {
         return "Subtask{id=" + getId() + ", " +
                 "epic_id=" + epicId + ", " +
                 ", title='" + getTitle() + '\'' +
                 ", description='" + getDescription() + '\'' +
-                ", status='" + getStatus() +  '\'' +
+                ", status='" + getStatus() + '\'' +
                 '}';
     }
 

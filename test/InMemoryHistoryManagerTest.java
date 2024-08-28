@@ -12,7 +12,7 @@ class InMemoryHistoryManagerTest {
 
     @BeforeAll
     public static void beforeAll() {
-        historyManager= Managers.getDefaultHistory();
+        historyManager = Managers.getDefaultHistory();
     }
 
     @Test
@@ -29,7 +29,7 @@ class InMemoryHistoryManagerTest {
     }
 
     /**
-     * проверяем неизменность записb задачи в истории после измениия объекта задачи
+     *
      */
     @Test
     public void getHistory() {
@@ -40,16 +40,27 @@ class InMemoryHistoryManagerTest {
         historyManager.add(task);
 
         // копируем из истории первоначальную запись о задаче
-        final Task taskEtalon = new Task(historyManager.getHistory().get(0));
+        final Task taskEtalon = new Task(historyManager.getHistory().getFirst());
 
         // изменяем первоначальную задачу
         task.setId(2);
         task.setDescription("меняем оописание задачи");
+
+        // проверяем неизменность записи задачи в истории после измениия объекта задачи
+        // первй элемент в истории должен остаться неизменным
+        assertEquals(taskEtalon, historyManager.getHistory().getFirst(),
+                "История искажена.");
+
+        // для задачи с измененным идентификатором должна быть создана отдельная запись истории
+        task.setStatus(TaskStatus.IN_PROGRESS);
+        historyManager.add(task);
+        assertEquals(2, historyManager.getHistory().size(),
+                "История не пополняется.");
+
+        // для задачи с существующим идентификатором запись истории должна перезаписаться
         task.setStatus(TaskStatus.DONE);
         historyManager.add(task);
-
-        // первй элемент в истории должен остаться неизменным
-        assertEquals(taskEtalon, historyManager.getHistory().get(0),
-                "История искажена.");
+        assertEquals(TaskStatus.DONE, historyManager.getHistory().get(1).getStatus(),
+                "История не обновляется.");
     }
 }

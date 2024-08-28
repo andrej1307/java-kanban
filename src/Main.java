@@ -1,7 +1,7 @@
-/**
- * Программа демонстрации рабботы методов класса TaskManager
- */
-import tasks.*;
+import tasks.Epic;
+import tasks.Subtask;
+import tasks.Task;
+import tasks.TaskStatus;
 
 public class Main {
     // создаем объект менеджера задач при помощи утилитарного класса
@@ -10,68 +10,97 @@ public class Main {
     public static void main(String[] args) {
 
         // добавляем простую задачу
-        int taskId = manager.addNewTask(new Task("Выпить кофе",
+        int taskId = manager.addNewTask(new Task("Выпить кофе.",
                 "Кофе с молоком, 1 ложка сахара."));
 
         // добавляем простую задачу
-        taskId = manager.addNewTask(new Task("Прочитать новости"));
+        taskId = manager.addNewTask(new Task("Прочитать новости."));
 
         // добавляем эпик
-        int epicId = manager.addNewEpic(new Epic("Выполнить спринт №4 \"Практикума\"."));
+        int epicId = manager.addNewEpic(new Epic("Выполнить иотговый проект \"Спринт №6\"."));
 
         // добавляем подзадачу к эпику
-        int subtaskId = manager.addNewSubtask(new Subtask(epicId,"Изучить теорию.",
-                "Изучить объекты и методы класса Object."));
+        int subtaskId = manager.addNewSubtask(new Subtask(epicId,
+                "Создать ветку в GIT."));
 
         // добавляем подзадачу к эпику
-        subtaskId = manager.addNewSubtask(new Subtask(epicId, "подготовить итоговый проект.",
-                "Написать программу итогового проекта."));
+        subtaskId = manager.addNewSubtask(new Subtask(epicId, "Изменить программу java-kanban",
+                "Написать программу истории задач без дублей."));
+
+        // добавляем подзадачу к эпику
+        subtaskId = manager.addNewSubtask(new Subtask(epicId,
+                "Сформировать \"Pull requests\" и отправить ревьюверу."));
+
+        // добавляем эпик
+        epicId = manager.addNewEpic(new Epic("Выполнить \"Спринт №7\" практикума."));
 
         printAllTasks(manager);
 
         manager.getTask(0).setStatus(TaskStatus.DONE);
-        Task task = manager.getTask(0);
-        manager.getTask(1).setStatus(TaskStatus.IN_PROGRESS);
-        task = manager.getTask(1);
+        System.out.println("\nИзменили статус задачи : " + manager.getTask(0).toString());
+        printHistory(manager);
 
-        System.out.println("\nПоменяли статус у двух задач.");
-        printAllTasks(manager);
+
+        manager.getTask(1).setStatus(TaskStatus.IN_PROGRESS);
+        System.out.println("\nИзменили статус задачи : " + manager.getTask(1).toString());
+        printHistory(manager);
 
         Subtask subtask = manager.getSubtasks(3);
         subtask.setStatus(TaskStatus.DONE);
         manager.updateSubtask(subtask);
-        subtask = manager.getSubtasks(3);
+        System.out.println("\nИзменили статус подзадачи : " + manager.getSubtasks(3).toString());
+        printHistory(manager);
 
         subtask = manager.getSubtasks(4);
         subtask.setStatus(TaskStatus.IN_PROGRESS);
         manager.updateSubtask(subtask);
-        subtask = manager.getSubtasks(4);
+        System.out.println("\nИзменили статус подзадачи : " + manager.getSubtasks(4).toString());
+        printHistory(manager);
 
-        System.out.println("\nПоменяли статус у подзадач 3, 4.");
+        System.out.println("\nПроверяем статус эпика : " + manager.getEpic(2).toString());
+        printHistory(manager);
+
+        System.out.println("\nПроверяем статус эпика : " + manager.getEpic(6).toString());
+        printHistory(manager);
+
+        System.out.println("\nПроверяем статус задачи : " + manager.getTask(0).toString());
+        printHistory(manager);
+
+        System.out.println("\nПроверяем статус подзадачи : " + manager.getSubtasks(5).toString());
+        printHistory(manager);
+
+        System.out.println("\nПроверяем статус подзадачи : " + manager.getSubtasks(4).toString());
+        printHistory(manager);
+
+        manager.removeEpic(2);
+        System.out.println("\nУдалили эпик с подзадачами.");
         printAllTasks(manager);
+        printHistory(manager);
 
-        subtaskId = manager.addNewSubtask(new Subtask(2, "Устранить замечания к проекту"));
+        System.out.println("\nСнов добавляем подзадачи к эпику.");
+        subtaskId = manager.addNewSubtask(new Subtask(6, "------1"));
+        System.out.println(manager.getSubtasks(subtaskId).toString());
 
-        System.out.println("\nДобавили 1 подзадачу");
+        subtaskId = manager.addNewSubtask(new Subtask(6, "------2"));
+        System.out.println(manager.getSubtasks(subtaskId).toString());
+
+        subtaskId = manager.addNewSubtask(new Subtask(6, "------3"));
+        System.out.println(manager.getSubtasks(subtaskId).toString());
+
+        System.out.println("\nДобавили подзадачи к эпику : " + manager.getEpic(6).toString());
+        printHistory(manager);
+
+        // добавляем эпик
+        epicId = manager.addNewEpic(new Epic("Еще один эпик."));
+        System.out.println("\nДобавили эпик : " + manager.getEpic(epicId));
         printAllTasks(manager);
+        printHistory(manager);
 
-        manager.removeTask(0);
-        manager.removeSubtask(4);
-
-        System.out.println("\nУдалили 1 задачу и 1 подзадачу");
+        System.out.println("\nУдаляем все эпики.");
+        manager.removeAllEpics();
         printAllTasks(manager);
+        printHistory(manager);
 
-        Epic e = manager.getEpic(2);
-
-        manager.removeAllSubtasks();
-        e = manager.getEpic(2);
-
-        System.out.println("\nУдалили все подзадачи");
-        printAllTasks(manager);
-
-        System.out.println("\n--");
-        task = manager.getTask(1);
-        printAllTasks(manager);
     }
 
     /**
@@ -94,6 +123,14 @@ public class Main {
         for (Subtask s : manager.getSubtaskList()) {
             System.out.println(s.toString());
         }
+    }
+
+    /**
+     * Распечатка истории обращения к задачам
+     *
+     * @param manager - менеджер задач
+     */
+    public static void printHistory(TaskManager manager) {
         System.out.println("История:");
         for (Task task : manager.getHistory()) {
             System.out.println(task.toString());

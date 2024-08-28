@@ -1,13 +1,18 @@
-import tasks.*;
+import tasks.Task;
+import util.Node;
+import util.SimpleLinkedList;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.LinkedList;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    private static final int HISTORY_MAX_SIZE = 10;
-    private final List<Task> history;
+    private final SimpleLinkedList<Task> historyList;
+    private final HashMap<Integer, Node<Task>> historyMap;
 
     public InMemoryHistoryManager() {
-        history = new LinkedList<>();
+        historyList = new SimpleLinkedList<>();
+        historyMap = new HashMap<>();
     }
 
     /**
@@ -17,40 +22,51 @@ public class InMemoryHistoryManager implements HistoryManager {
      *  при дальнейшем изменении первоначальной задачи.
      */
 
+    /**
+     * добавление задачи в конец связанного списка истории просмотров
+     *
+     * @param task - задача для добавления или обновления
+     */
     @Override
     public void add(Task task) {
         if (task == null) return;
-        if (history.size() ==  HISTORY_MAX_SIZE) {
-            history.removeFirst();
+        int taskId = task.getId();
+        Node<Task> newNode = new Node(null, new Task(task), null);
+        if (historyMap.containsKey(taskId)) {
+            historyList.removeNode(historyMap.get(taskId));
         }
-        history.addLast(new Task(task));
+        historyMap.put(taskId, newNode);
+        historyList.addLastNode(newNode);
     }
 
-    @Override
-    public void add(Epic epic) {
-        if (epic == null) return;
-        if (history.size() ==  HISTORY_MAX_SIZE) {
-            history.remove(0);
+    /**
+     * Удаление задачи из списка истори
+     *
+     * @param taskId - идентификатор задачи
+     */
+    public void remove(int taskId) {
+        if (historyMap.containsKey(taskId)) {
+            historyList.removeNode(historyMap.get(taskId));
+            historyMap.remove(taskId);
         }
-        history.add(new Epic(epic));
     }
 
-    @Override
-    public void add(Subtask subtask) {
-        if (subtask == null) return;
-        if (history.size() ==  HISTORY_MAX_SIZE) {
-            history.remove(0);
-        }
-        history.add(new Subtask(subtask));
-    }
-
+    /**
+     * Чтение списка истории чтения задач
+     *
+     * @return - список просмоотренных задач
+     */
     @Override
     public List<Task> getHistory() {
-        return new LinkedList<>(history);
+        List<Task> taskList = new ArrayList<>();
+        for (Task task : historyList) {
+            taskList.add(task);
+        }
+        return taskList;
     }
 
-    @Override
     public void clear() {
-        history.clear();
+        historyList.clear();
+        historyMap.clear();
     }
 }

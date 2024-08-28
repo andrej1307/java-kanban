@@ -3,7 +3,7 @@ package tasks;
 import java.util.List;
 import java.util.ArrayList;
 
-public class Epic  extends Task {
+public class Epic extends Task {
     private List<Integer> subtaskList;
 
     // конструктор с параметрами "имя", "описание"
@@ -27,7 +27,7 @@ public class Epic  extends Task {
     // Переопределяем метод отображения объекта
     @Override
     public String toString() {
-        return  "Epic{" +
+        return "Epic{" +
                 "id=" + getId() +
                 ", title='" + getTitle() + '\'' +
                 ", description='" + getDescription() + '\'' +
@@ -52,9 +52,11 @@ public class Epic  extends Task {
     }
 
     // Удаление идентификатора подзадачи из списка эпика
-    public void  removeSubtask(Integer subtaskId) {
+    public void removeSubtask(Integer subtaskId) {
         int index = subtaskList.indexOf(subtaskId);
-        if (index < 0) { return; }
+        if (index < 0) {
+            return;
+        }
         subtaskList.remove(index);
     }
 
@@ -64,7 +66,7 @@ public class Epic  extends Task {
     }
 
     // метод переписывания списка подзадач, массивом новых идентификаторов
-    public void reloadSubtakList( ArrayList<Integer> newSubtaskList) {
+    public void reloadSubtakList(ArrayList<Integer> newSubtaskList) {
         subtaskList.clear();
         subtaskList.addAll(newSubtaskList);
     }
