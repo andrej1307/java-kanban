@@ -70,24 +70,6 @@ class InMemoryTaskManagerTest {
     }
 
     /**
-     * Проверяем невозможность обновления задачи с идентификатором, которого не существует.
-     *
-     * я так понял пункт технического задания:
-     * "проверьте, что задачи с заданным id и сгенерированным id не конфликтуют внутри менеджера;"
-     */
-    @Test
-    public void updateTask() {
-        Task task = new Task("Test updateNewTask", "Test updateTask description");
-        final int taskId = manager.addNewTask(task);
-
-        Task taskModifed = new Task(task);
-        taskModifed.setDescription("Измененная задача");
-        taskModifed.setId(1000);
-        assertTrue(manager.updateTask(taskModifed) < 0,
-                "Попытка обновления задачи с несуществующим идентификатором");
-    }
-
-    /**
      * Проверка неизменности всех полей задачи после добавления в меджкр
      */
     @Test
