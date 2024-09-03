@@ -1,9 +1,10 @@
-import tasks.*;
-import java.util.List;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import tasks.Epic;
+import tasks.Subtask;
+import tasks.Task;
 
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
