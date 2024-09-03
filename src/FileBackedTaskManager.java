@@ -6,7 +6,7 @@ import java.io.*;
  * класс менеджера задач с поддержной сохранения данных в файл и загрузки
  */
 public class FileBackedTaskManager extends InMemoryTaskManager {
-    final private String fileName;
+    private final String fileName;
     private boolean loadInprogres;
 
     /**
