@@ -1,0 +1,8 @@
+id;type;name;status;description;epic
+0;TASK;Выпить кофе.;DONE;Кофе с молоком, 1 ложка сахара.;
+1;TASK;Прочитать новости.;IN_PROGRESS;-;
+2;EPIC;Выполнить иотговый проект "Спринт №6".;IN_PROGRESS;-;
+6;EPIC;Выполнить "Спринт №7" практикума.;NEW;-;
+3;SUBTASK;Создать ветку в GIT.;DONE;-;2
+4;SUBTASK;Изменить программу java-kanban;IN_PROGRESS;Написать программу истории задач без дублей.;2
+5;SUBTASK;Сформировать "Pull requests" и отправить ревьюверу.;NEW;-;2

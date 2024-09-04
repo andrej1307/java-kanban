@@ -98,9 +98,6 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public int updateTask(Task task) {
         int id = task.getId();
-/*        if (!taskList.containsKey(id)) {
-            return -1;
-        } */
         taskList.put(id, task);
         return id;
     }
@@ -109,9 +106,6 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public int updateEpic(Epic newEpic) {
         int id = newEpic.getId();
-/*        if (!epicList.containsKey(id)) {
-            return -1;
-        } */
         epicList.put(id, newEpic);
         newEpic.reloadSubtakList(getEpic(id).getSubtasks());
         setStatusEpic(id);
@@ -130,9 +124,6 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public int updateSubtask(Subtask newSubtask) {
         int id = newSubtask.getId();
-/*        if (!subtaskList.containsKey(id)) {
-            return -1;
-        }  */
         int epicId = newSubtask.getEpicId();
         if (!epicList.containsKey(epicId)) {
             return -2;

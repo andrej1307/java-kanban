@@ -6,7 +6,7 @@ import java.io.*;
  * класс менеджера задач с поддержной сохранения данных в файл и загрузки
  */
 public class FileBackedTaskManager extends InMemoryTaskManager {
-    private final String fileName;
+    private String fileName;
     private boolean loadInprogres;
 
     /**
@@ -89,6 +89,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
             manager.setLoadFlag(true);
             String line = bufferedReader.readLine();
+            if (line == null) {
+                manager.setLoadFlag(false);
+                return manager;
+            }
             while ((line = bufferedReader.readLine()) != null) {
                 if (!line.isBlank()) {
                     String[] tokens = line.split(";");
@@ -121,7 +125,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             e.printStackTrace();
         } finally {
             manager.setLoadFlag(false); // сбрасываем признак выполнения загрузки
-            manager.resetMainId();      // пересчитываем идентификатор задач в менеджере.
+            if (manager.getNumberOfObjects() > 0) {
+                manager.resetMainId();      // пересчитываем идентификатор задач в менеджере.
+            }
         }
         return manager;
     }
@@ -213,4 +219,16 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         save();
     }
 
+    public String getSaveFileName() {
+        return fileName;
+    }
+
+    /**
+     * Изменяем имя файла для сохранения данных
+     *
+     * @param fileName - имя файла
+     */
+    public void setSaveFileName(String fileName) {
+        this.fileName = fileName;
+    }
 }

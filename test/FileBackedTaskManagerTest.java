@@ -9,8 +9,7 @@ import tasks.Task;
 import java.io.File;
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class FileBackedTaskManagerTest {
     private static FileBackedTaskManager manager;
@@ -93,4 +92,42 @@ class FileBackedTaskManagerTest {
         assertEquals(4, taskId,
                 "Некорректный счетчмк идентификаторов после загрузки файла.");
     }
+
+    /**
+     * Тестируем тестируем сохранение и загрузку пустого менеджера задач.
+     */
+    @Test
+    void saveAndLoadEmptyManager() {
+        int taskId = manager.addNewTask(new Task("Task 1",
+                "Description task 1"));
+        manager.removeTask(taskId);
+        assertEquals(0, manager.getNumberOfObjects(),
+                "Список задач не пуст.");
+
+        tmpFile = new File(filename);
+        FileBackedTaskManager manager2 = FileBackedTaskManager.loadFromFile(tmpFile);
+        assertEquals(0, manager2.getNumberOfObjects(),
+                "Загруженный список задач не пуст.");
+
+    }
+
+    @Test
+    void loadEmptyFile() {
+        FileBackedTaskManager manager2;
+        tmpFile = new File(filename);
+
+        try {
+            tmpFile.createNewFile(); // создаем пустой файл
+            manager2 = FileBackedTaskManager.loadFromFile(tmpFile);
+            assertNotNull(manager2, "Ошибка создания менеджера задач.");
+            int taskId = manager2.addNewTask(new Task("Task 1",
+                    "Description task 1"));
+            assertEquals(1, manager2.getNumberOfObjects(),
+                    "Ошибка работы с созданным менеджером.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
 }

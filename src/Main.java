@@ -1,7 +1,6 @@
 import tasks.Epic;
 import tasks.Subtask;
 import tasks.Task;
-import tasks.TaskStatus;
 
 public class Main {
     // создаем объект менеджера задач при помощи утилитарного класса
@@ -9,53 +8,7 @@ public class Main {
 
     public static void main(String[] args) {
 
-        // добавляем простую задачу
-        int taskId = manager.addNewTask(new Task("Выпить кофе.",
-                "Кофе с молоком, 1 ложка сахара."));
-
-        // добавляем простую задачу
-        taskId = manager.addNewTask(new Task("Прочитать новости."));
-
-        // добавляем эпик
-        int epicId = manager.addNewEpic(new Epic("Выполнить иотговый проект \"Спринт №6\"."));
-
-        // добавляем подзадачу к эпику
-        int subtaskId = manager.addNewSubtask(new Subtask(epicId,
-                "Создать ветку в GIT."));
-
-        // добавляем подзадачу к эпику
-        subtaskId = manager.addNewSubtask(new Subtask(epicId, "Изменить программу java-kanban",
-                "Написать программу истории задач без дублей."));
-
-        // добавляем подзадачу к эпику
-        subtaskId = manager.addNewSubtask(new Subtask(epicId,
-                "Сформировать \"Pull requests\" и отправить ревьюверу."));
-
-        // добавляем эпик
-        epicId = manager.addNewEpic(new Epic("Выполнить \"Спринт №7\" практикума."));
-
-        printAllTasks(manager);
-
-        manager.getTask(0).setStatus(TaskStatus.DONE);
-        System.out.println("\nИзменили статус задачи : " + manager.getTask(0).toString());
-        printHistory(manager);
-
-
-        manager.getTask(1).setStatus(TaskStatus.IN_PROGRESS);
-        System.out.println("\nИзменили статус задачи : " + manager.getTask(1).toString());
-        printHistory(manager);
-
-        Subtask subtask = manager.getSubtasks(3);
-        subtask.setStatus(TaskStatus.DONE);
-        manager.updateSubtask(subtask);
-        System.out.println("\nИзменили статус подзадачи : " + manager.getSubtasks(3).toString());
-        printHistory(manager);
-
-        subtask = manager.getSubtasks(4);
-        subtask.setStatus(TaskStatus.IN_PROGRESS);
-        manager.updateSubtask(subtask);
-        System.out.println("\nИзменили статус подзадачи : " + manager.getSubtasks(4).toString());
-        printHistory(manager);
+        // Список задач загружениз файла
 
         System.out.println("\nПроверяем статус эпика : " + manager.getEpic(2).toString());
         printHistory(manager);
@@ -72,39 +25,13 @@ public class Main {
         System.out.println("\nПроверяем статус подзадачи : " + manager.getSubtasks(4).toString());
         printHistory(manager);
 
-        manager.removeEpic(2);
-        System.out.println("\nУдалили эпик с подзадачами.");
         printAllTasks(manager);
-        printHistory(manager);
-
-        System.out.println("\nСнов добавляем подзадачи к эпику.");
-        subtaskId = manager.addNewSubtask(new Subtask(6, "------1"));
-        System.out.println(manager.getSubtasks(subtaskId).toString());
-
-        subtaskId = manager.addNewSubtask(new Subtask(6, "------2"));
-        System.out.println(manager.getSubtasks(subtaskId).toString());
-
-        subtaskId = manager.addNewSubtask(new Subtask(6, "------3"));
-        System.out.println(manager.getSubtasks(subtaskId).toString());
-
-        System.out.println("\nДобавили подзадачи к эпику : " + manager.getEpic(6).toString());
-        printHistory(manager);
-
-        // добавляем эпик
-        epicId = manager.addNewEpic(new Epic("Еще один эпик."));
-        System.out.println("\nДобавили эпик : " + manager.getEpic(epicId));
-        printAllTasks(manager);
-        printHistory(manager);
-
-        System.out.println("\nУдаляем все эпики.");
-        manager.removeAllEpics();
-        printAllTasks(manager);
-        printHistory(manager);
-
     }
 
     /**
      * Вывод на экран списка всех задач
+     *
+     * @param manager - менеджер задач
      */
     public static void printAllTasks(TaskManager manager) {
         System.out.println("\nВ списке задач " + manager.getNumberOfObjects() + " записей.");
