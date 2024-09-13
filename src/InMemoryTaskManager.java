@@ -98,9 +98,6 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public int updateTask(Task task) {
         int id = task.getId();
-        if (!taskList.containsKey(id)) {
-            return -1;
-        }
         taskList.put(id, task);
         return id;
     }
@@ -109,19 +106,16 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public int updateEpic(Epic newEpic) {
         int id = newEpic.getId();
-        if (!epicList.containsKey(id)) {
-            return -1;
-        }
-        newEpic.reloadSubtakList(getEpic(id).getSubtasks());
         epicList.put(id, newEpic);
+        newEpic.reloadSubtakList(getEpic(id).getSubtasks());
         setStatusEpic(id);
         return id;
     }
 
     /**
      * Обновление объекта Subtask.
-     * проверяем существования подзадачи с указанным идентификатором
-     * и существование соответствующего эпика. Если не найдены, то возвращаем  код меньше 0.
+     * проверяем _________________
+     * _ существование соответствующего эпика. Если не найдены, то возвращаем  код меньше 0.
      * Если и эпик и подзадача существуют заменяем объект подзадачи на новый
      *
      * @param newSubtask - идентификатор объекта, содержащий новую информацию
@@ -130,9 +124,6 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public int updateSubtask(Subtask newSubtask) {
         int id = newSubtask.getId();
-        if (!subtaskList.containsKey(id)) {
-            return -1;
-        }
         int epicId = newSubtask.getEpicId();
         if (!epicList.containsKey(epicId)) {
             return -2;
@@ -301,4 +292,26 @@ public class InMemoryTaskManager implements TaskManager {
         return viewHistory.getHistory();
     }
 
+    public void clear() {
+        removeAllTasks();
+        removeAllEpics();
+        idMain = 0;
+    }
+
+    /**
+     * Пересчет идентификатора задач после загрузки данных из файла
+     */
+    public void resetMainId() {
+        int maxId = 0;
+        for (int i : taskList.keySet()) {
+            if (i > maxId) maxId = i;
+        }
+        for (int i : epicList.keySet()) {
+            if (i > maxId) maxId = i;
+        }
+        for (int i : subtaskList.keySet()) {
+            if (i > maxId) maxId = i;
+        }
+        idMain = maxId + 1;
+    }
 }

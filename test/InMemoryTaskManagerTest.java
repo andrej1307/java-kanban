@@ -1,9 +1,10 @@
-import tasks.*;
-import java.util.List;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import tasks.Epic;
+import tasks.Subtask;
+import tasks.Task;
 
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -66,24 +67,6 @@ class InMemoryTaskManagerTest {
         assertNotNull(subtasks, "Подзадачи не возвращаются.");
         assertEquals(1, subtasks.size(), "Неверное количество подзадач.");
         assertEquals(subtask, subtasks.get(0), "Подзадачи не совпадают.");
-    }
-
-    /**
-     * Проверяем невозможность обновления задачи с идентификатором, которого не существует.
-     *
-     * я так понял пункт технического задания:
-     * "проверьте, что задачи с заданным id и сгенерированным id не конфликтуют внутри менеджера;"
-     */
-    @Test
-    public void updateTask() {
-        Task task = new Task("Test updateNewTask", "Test updateTask description");
-        final int taskId = manager.addNewTask(task);
-
-        Task taskModifed = new Task(task);
-        taskModifed.setDescription("Измененная задача");
-        taskModifed.setId(1000);
-        assertTrue(manager.updateTask(taskModifed) < 0,
-                "Попытка обновления задачи с несуществующим идентификатором");
     }
 
     /**
