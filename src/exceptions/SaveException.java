@@ -1,4 +1,4 @@
-package Manager.Exceptions;
+package exceptions;
 
 public class SaveException extends RuntimeException {
     private final String filename;
