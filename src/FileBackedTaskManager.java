@@ -27,6 +27,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     public FileBackedTaskManager() {
         super();
+        this.fileName = "";
         loadInprogres = false;
     }
 
