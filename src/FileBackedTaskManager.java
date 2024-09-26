@@ -1,6 +1,11 @@
+import ManagerExceptions.ManagerLoadException;
+import ManagerExceptions.ManagerSaveException;
 import tasks.*;
 
 import java.io.*;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 
 /**
  * класс менеджера задач с поддержной сохранения данных в файл и загрузки
@@ -20,6 +25,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         loadInprogres = false;
     }
 
+    public FileBackedTaskManager() {
+        super();
+        loadInprogres = false;
+    }
+
     /**
      * подготовка информации о задаче для записи в файл
      *
@@ -27,9 +37,34 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
      * @return - строка информации о задаче.
      */
     private String toString(Task task) {
-        return String.format("%s;#type#;%s;%s;%s;",
-                task.getId(), task.getTitle(),
-                task.getStatus(), task.getDescription());
+        String row;
+        String startTime;
+        String duration;
+
+        try {
+            if (task.getStartTime() == null) {
+                startTime = "null";
+            } else {
+                startTime = task.getStartTime().format(Task.DATE_TIME_FORMATTER);
+            }
+            if (task.getDuration() == null) {
+                duration = "null";
+            } else {
+                duration = String.format("%d", task.getDuration().toMinutes());
+            }
+
+            row = String.format("%s;%s;%s;#type#;%s;%s;%s;",
+                    task.getId(),
+                    startTime,
+                    duration,
+                    task.getTitle(),
+                    task.getStatus(),
+                    task.getDescription());
+        } catch (Exception e) {
+            throw new ManagerSaveException("Ошибка сохранения в файл. "
+                    + e.getMessage(), fileName);
+        }
+        return row;
     }
 
     /**
@@ -45,7 +80,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
         try (FileWriter fileWriter = new FileWriter(fileName)) {
             // В первую строку файла записываем наименования полей.
-            fileWriter.write("id;type;name;status;description;epic\n");
+            fileWriter.write("id;DateTime;Duration(min);type;name;status;description;epic\n");
 
             // сохраняем задачи
             String taskType = TaskType.TASK.toString();
@@ -71,7 +106,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             fileWriter.flush();
 
         } catch (IOException e) {
-            throw new ManagerSaveException("Ошибка сохранения в файл:"
+            throw new ManagerSaveException("Ошибка сохранения в файл. "
                     + e.getMessage(), fileName);
         }
     }
@@ -82,12 +117,16 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
      * @param file - файл с описанием задач
      * @return - ссылка на объект менеджера задач
      */
-    static FileBackedTaskManager loadFromFile(File file) {
+    static FileBackedTaskManager loadFromFile(File file) throws ManagerLoadException {
         FileBackedTaskManager manager;
         manager = new FileBackedTaskManager(file.getAbsolutePath());
 
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
+            LocalDateTime startTime;
+            Duration duration;
+
             manager.setLoadFlag(true);
+
             String line = bufferedReader.readLine();
             if (line == null) {
                 manager.setLoadFlag(false);
@@ -96,33 +135,61 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             while ((line = bufferedReader.readLine()) != null) {
                 if (!line.isBlank()) {
                     String[] tokens = line.split(";");
-                    if (tokens.length < 5) {
+                    if (tokens.length < 7) {
                         continue;
                     }
-                    if (tokens[1].equals(TaskType.TASK.toString())) {
-                        Task task = new Task(tokens[2], tokens[4]);
-                        task.setId(Integer.decode(tokens[0]));
-                        task.setStatus(TaskStatus.valueOf(tokens[3]));
+                    int id = Integer.decode(tokens[0]);
+                    try {
+                        if (tokens[1].toLowerCase().equals("null")) {
+                            startTime = null;
+                        } else {
+                            startTime = LocalDateTime.parse(tokens[1],
+                                    Task.DATE_TIME_FORMATTER);
+                        }
+                    } catch (DateTimeParseException e) {
+                        throw new ManagerLoadException("Ошибка чтения времени из файла. "
+                                + e.getMessage(), file.getAbsolutePath().toString());
+                    }
+                    if (tokens[2].toLowerCase().equals("null")) {
+                        duration = null;
+                    } else {
+                        duration = Duration.ofMinutes(Integer.decode(tokens[2]));
+                    }
+                    String taskType = tokens[3];
+                    String title = tokens[4];
+                    String status = tokens[5];
+                    String description = tokens[6];
+
+                    if (taskType.equals(TaskType.TASK.toString())) {
+                        Task task = new Task(title, description);
+                        task.setId(id);
+                        task.setStatus(TaskStatus.valueOf(status));
+                        task.setStartTime(startTime);
+                        task.setDuration(duration);
                         manager.updateTask(task);
-                    } else if (tokens[1].equals(TaskType.EPIC.toString())) {
-                        Epic epic = new Epic(tokens[2], tokens[4]);
-                        epic.setId(Integer.decode(tokens[0]));
-                        epic.setStatus(TaskStatus.valueOf(tokens[3]));
+                    } else if (taskType.equals(TaskType.EPIC.toString())) {
+                        Epic epic = new Epic(title, description);
+                        epic.setId(id);
+                        epic.setStatus(TaskStatus.valueOf(status));
+                        epic.setStartTime(startTime);
+                        epic.setDuration(duration);
                         manager.updateEpic(epic);
-                    } else if (tokens[1].equals(TaskType.SUBTASK.toString())) {
-                        int subtaskId = Integer.decode(tokens[0]);
-                        int epicId = Integer.decode(tokens[5]);
+                    } else if (taskType.equals(TaskType.SUBTASK.toString())) {
+                        int epicId = Integer.decode(tokens[7]);
                         Epic epic = manager.getEpic(epicId);
-                        epic.addSubtask(subtaskId);
-                        Subtask subtask = new Subtask(epicId, tokens[2], tokens[4]);
-                        subtask.setId(subtaskId);
-                        subtask.setStatus(TaskStatus.valueOf(tokens[3]));
+                        epic.addSubtask(id);
+                        Subtask subtask = new Subtask(epicId, title, description);
+                        subtask.setId(id);
+                        subtask.setStatus(TaskStatus.valueOf(status));
+                        subtask.setStartTime(startTime);
+                        subtask.setDuration(duration);
                         manager.updateSubtask(subtask);
                     }
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new ManagerLoadException("Ошибка загрузки данных из файла. "
+                    + e.getMessage(), file.getAbsolutePath().toString());
         } finally {
             manager.setLoadFlag(false); // сбрасываем признак выполнения загрузки
             if (manager.getNumberOfObjects() > 0) {
@@ -231,4 +298,5 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public void setSaveFileName(String fileName) {
         this.fileName = fileName;
     }
+
 }

@@ -1,86 +1,111 @@
-import org.junit.jupiter.api.BeforeAll;
+import ManagerExceptions.TaskCrossTimeException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tasks.Epic;
 import tasks.Subtask;
 import tasks.Task;
+import tasks.TaskStatus;
 
-import java.util.List;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class InMemoryTaskManagerTest {
-    private static TaskManager manager;
-
-    @BeforeAll
-    public static void beforeAll() {
-        manager = Managers.getDefault();
-    }
-    @Test
-    public void addNewTask() {
-        Task task = new Task("Test addNewTask", "Test addNewTask description");
-        final int taskId = manager.addNewTask(task);
-
-        final Task savedTask = manager.getTask(taskId);
-
-        assertNotNull(savedTask, "Задача не найдена.");
-        assertEquals(task, savedTask, "Задачи не совпадают.");
-
-        final List<Task> tasks = manager.getTaskList();
-
-        assertNotNull(tasks, "Задачи не возвращаются.");
-        assertEquals(1, tasks.size(), "Неверное количество задач.");
-        assertEquals(task, tasks.get(0), "Задачи не совпадают.");
+class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
+    // инициализируем родительский класс
+    InMemoryTaskManagerTest() {
+        super(new InMemoryTaskManager());
     }
 
-    @Test
-    public void addNewEpic() {
-        manager.removeAllEpics();
-        Epic epic = new Epic("Test addNewEpic", "Test addNewEpic description");
-        final int epicId = manager.addNewEpic(epic);
-
-        final Epic savedEpic = manager.getEpic(epicId);
-
-        assertNotNull(savedEpic, "Эпик не найден.");
-        assertEquals(epic, savedEpic, "Эпики не совпадают.");
-
-        final List<Epic> epics = manager.getEpicList();
-
-        assertNotNull(epics, "Эпики не возвращаются.");
-        assertEquals(1, epics.size(), "Неверное количество эпиков.");
-        assertEquals(epic, epics.get(0), "Эпики не совпадают.");
-    }
-
-    @Test
-    public void addNewSubtask() {
-        Epic epic = new Epic("Test addNewEpicForSubtask");
-        final int epicId = manager.addNewEpic(epic);
-
-        Subtask subtask = new Subtask(epicId, "Test addNewSubtask");
-        final int subtaskId = manager.addNewSubtask(subtask);
-
-        final Subtask savedSubtask = manager.getSubtasks(subtaskId);
-        assertNotNull(savedSubtask, "Подзадача не найдена.");
-        assertEquals(subtask, savedSubtask, "Подзадачи не совпадают.");
-
-        final List<Subtask> subtasks = manager.getSubtaskList();
-
-        assertNotNull(subtasks, "Подзадачи не возвращаются.");
-        assertEquals(1, subtasks.size(), "Неверное количество подзадач.");
-        assertEquals(subtask, subtasks.get(0), "Подзадачи не совпадают.");
+    @BeforeEach
+    void beforeEach() {
+        manager.clear();
     }
 
     /**
-     * Проверка неизменности всех полей задачи после добавления в меджкр
+     * Тестируем расчет статуса эпика
      */
     @Test
-    public void testTaskFildsUnchangeable() {
-        Task task = new Task("Test TaskFildsUnchangeable");
-        final int taskId = manager.addNewTask(task);
-        final Task savedTask = manager.getTask(taskId);
+    void statusEpic() {
+        final int epicId = manager.addNewEpic(new Epic("Test epicStatus Epic",
+                "Epic"));
+        assertEquals(TaskStatus.NEW, manager.getEpic(epicId).getStatus(),
+                "Не ожидаемый статус у нового эпика.");
 
-        assertEquals(task.getId(), savedTask.getId(), "Идентификаторы задач различаются");
-        assertEquals(task.getTitle(), savedTask.getTitle(), "Наименования задач раздичаются");
-        assertEquals(task.getDescription(), savedTask.getDescription(), "Описания задач различаются");
-        assertEquals(task.getStatus(), savedTask.getStatus(), "Статус задач различается");
+        int subtaskId1 = manager.addNewSubtask(new Subtask(epicId, "Test epicStatus Subtask1",
+                "subtask1",
+                LocalDateTime.now(),
+                Duration.ofMinutes(15)));
+        int subtaskId2 = manager.addNewSubtask(new Subtask(epicId, "Test epicStatus Subtask1",
+                "subtask1",
+                LocalDateTime.now().plusMinutes(20),
+                Duration.ofMinutes(15)));
+        assertEquals(TaskStatus.NEW, manager.getEpic(epicId).getStatus(),
+                "Не ожидаемый статус у эпика. (Все подзадачи - NEW)");
+
+        Subtask subtask = new Subtask(manager.getSubtask(subtaskId2));
+        subtask.setStatus(TaskStatus.IN_PROGRESS);
+        manager.updateSubtask(subtask);
+        assertEquals(TaskStatus.IN_PROGRESS, manager.getEpic(epicId).getStatus(),
+                "Не ожидаемый статус у эпика. (подзадачи - NEW,IN_PROGRESS)");
+
+        subtask.setStatus(TaskStatus.DONE);
+        manager.updateSubtask(subtask);
+        assertEquals(TaskStatus.IN_PROGRESS, manager.getEpic(epicId).getStatus(),
+                "Не ожидаемый статус у эпика. (подзадачи - NEW,DONE)");
+
+        subtask = new Subtask(manager.getSubtask(subtaskId1));
+        subtask.setStatus(TaskStatus.DONE);
+        manager.updateSubtask(subtask);
+        assertEquals(TaskStatus.DONE, manager.getEpic(epicId).getStatus(),
+                "Не ожидаемый статус у эпика. (подзадачи - DONE,DONE)");
+    }
+
+    /**
+     * Тестируем конфликты времени при добавлении задач, подзадач.
+     */
+    @Test
+    void timeConflict() {
+        manager.addNewTask(new Task("Test timeConflict Task1",
+                "task1",
+                LocalDateTime.now().plusMinutes(20),
+                Duration.ofMinutes(20)));
+
+        // Создаем задачу с периодом перекрвыающим начало существующей задачи
+        Task task = new Task("Test timeConflict Task2",
+                "task2",
+                LocalDateTime.now().plusMinutes(10),
+                Duration.ofMinutes(20));
+        assertThrows(TaskCrossTimeException.class,
+                () -> {
+                    manager.addNewTask(task);
+                },
+                "Наложение времени задач должно приводить к исключению.");
+
+        // изменяем период задачи на перекрвыающий окончание существующей задачи
+        task.setStartTime(LocalDateTime.now().plusMinutes(30));
+        assertThrows(TaskCrossTimeException.class,
+                () -> {
+                    manager.addNewTask(task);
+                },
+                "Наложение времени задач должно приводить к исключению.");
+
+        // изменяем период задачи на вложенный во время выполнения существующей задачи
+        task.setDuration(Duration.ofMinutes(5));
+        assertThrows(TaskCrossTimeException.class,
+                () -> {
+                    manager.addNewTask(task);
+                },
+                "Наложение времени задач должно приводить к исключению.");
+
+        // изменяем период задачи на перекрвыающий все время выполнения существующей задачи
+        task.setStartTime(LocalDateTime.now().plusMinutes(10));
+        task.setDuration(Duration.ofMinutes(50));
+        assertThrows(TaskCrossTimeException.class,
+                () -> {
+                    manager.addNewTask(task);
+                },
+                "Наложение времени задач должно приводить к исключению.");
     }
 }

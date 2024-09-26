@@ -2,6 +2,9 @@ import tasks.Epic;
 import tasks.Subtask;
 import tasks.Task;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 public class Main {
     // создаем объект менеджера задач при помощи утилитарного класса
     public static TaskManager manager = Managers.getDefault();
@@ -9,23 +12,29 @@ public class Main {
     public static void main(String[] args) {
 
         // Список задач загружениз файла
+        printAllTasks(manager);
 
         System.out.println("\nПроверяем статус эпика : " + manager.getEpic(2).toString());
-        printHistory(manager);
 
         System.out.println("\nПроверяем статус эпика : " + manager.getEpic(6).toString());
-        printHistory(manager);
 
         System.out.println("\nПроверяем статус задачи : " + manager.getTask(0).toString());
+
+        System.out.println("\nПроверяем статус подзадачи : " + manager.getSubtask(5).toString());
+
+        System.out.println("\nПроверяем статус подзадачи : " + manager.getSubtask(4).toString());
         printHistory(manager);
 
-        System.out.println("\nПроверяем статус подзадачи : " + manager.getSubtasks(5).toString());
-        printHistory(manager);
+        // Задаем имя файла для сохранения измененийв списке задач
+        ((FileBackedTaskManager) manager).setSaveFileName(".\\data\\tasksSave.csv");
 
-        System.out.println("\nПроверяем статус подзадачи : " + manager.getSubtasks(4).toString());
-        printHistory(manager);
+        manager.addNewTask(new Task("Задача №4", "****",
+                LocalDateTime.of(2024, 12, 31, 11, 45),
+                Duration.ofMinutes(15)));
 
-        printAllTasks(manager);
+        System.out.println("\n******* Сортировка задач по времени запуска. **********************");
+        manager.getPrioritizedTasks().stream()
+                .forEach((Task t) -> System.out.println(t.toString()));
     }
 
     /**

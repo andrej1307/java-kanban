@@ -1,10 +1,13 @@
 package tasks;
 
-import java.util.List;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Epic extends Task {
     private List<Integer> subtaskList;
+    private LocalDateTime endTime;
 
     // конструктор с параметрами "имя", "описание"
     public Epic(String title, String description) {
@@ -27,13 +30,28 @@ public class Epic extends Task {
     // Переопределяем метод отображения объекта
     @Override
     public String toString() {
-        return "Epic{" +
+        String result = "Epic{" +
                 "id=" + getId() +
-                ", title='" + getTitle() + '\'' +
+                ", startTime='";
+
+        if (getStartTime() == null) {
+            result += "null'";
+        } else {
+            result += getStartTime().format(DATE_TIME_FORMATTER) + '\'';
+        }
+        result += ", duration='";
+        if (endTime == null) {
+            result += "null'";
+        } else {
+            result += getDuration().toHours() + ":" + getDuration().toMinutesPart() + '\'';
+        }
+
+        result += ", title='" + getTitle() + '\'' +
                 ", description='" + getDescription() + '\'' +
                 ", status=" + getStatus() +
                 ", subtaskNumber=" + subtaskList.size() +
                 '}';
+        return result;
     }
 
     // получение списка идентификаторов подзадач
@@ -70,4 +88,22 @@ public class Epic extends Task {
         subtaskList.clear();
         subtaskList.addAll(newSubtaskList);
     }
+
+    @Override
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
+    @Override
+    public Duration getDuration() {
+        if (getStartTime() == null || endTime == null) {
+            return null;
+        }
+        return Duration.between(getStartTime(), endTime);
+    }
+
 }
