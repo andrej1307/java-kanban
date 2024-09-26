@@ -1,5 +1,5 @@
-import ManagerExceptions.ManagerLoadException;
-import ManagerExceptions.ManagerSaveException;
+import Manager.Exceptions.LoadException;
+import Manager.Exceptions.SaveException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -62,7 +62,7 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
                     Duration.ofMinutes(15)));
             assertTrue(tmpFile.length() > 0,
                     "данные не сохранены.\n" + filename);
-        } catch (ManagerSaveException e) {
+        } catch (SaveException e) {
             System.out.println(e.getDetailMessage());
         }
     }
@@ -166,7 +166,7 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
 
         // задаем некорректное имя файла для сохранения
         manager.setSaveFileName("");
-        assertThrows(ManagerSaveException.class,
+        assertThrows(SaveException.class,
                 () -> {
                     manager.addNewTask(task);
                 },
@@ -187,7 +187,7 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
             e.printStackTrace();
         }
 
-        assertThrows(ManagerLoadException.class,
+        assertThrows(LoadException.class,
                 () -> {
                     FileBackedTaskManager.loadFromFile(tmpFile);
                 },

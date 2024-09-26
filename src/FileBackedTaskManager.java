@@ -1,5 +1,5 @@
-import ManagerExceptions.ManagerLoadException;
-import ManagerExceptions.ManagerSaveException;
+import Manager.Exceptions.LoadException;
+import Manager.Exceptions.SaveException;
 import tasks.*;
 
 import java.io.*;
@@ -61,7 +61,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     task.getStatus(),
                     task.getDescription());
         } catch (Exception e) {
-            throw new ManagerSaveException("Ошибка сохранения в файл. "
+            throw new SaveException("Ошибка сохранения в файл. "
                     + e.getMessage(), fileName);
         }
         return row;
@@ -70,9 +70,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     /**
      * Сохранение информации о задачах в файл
      *
-     * @throws ManagerSaveException - исключение при ошибках работы с файлом
+     * @throws SaveException - исключение при ошибках работы с файлом
      */
-    public void save() throws ManagerSaveException {
+    public void save() throws SaveException {
         // при загрузке данных из файла ничего не пишем.
         if (loadInprogres) {
             return;
@@ -106,7 +106,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             fileWriter.flush();
 
         } catch (IOException e) {
-            throw new ManagerSaveException("Ошибка сохранения в файл. "
+            throw new SaveException("Ошибка сохранения в файл. "
                     + e.getMessage(), fileName);
         }
     }
@@ -117,7 +117,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
      * @param file - файл с описанием задач
      * @return - ссылка на объект менеджера задач
      */
-    static FileBackedTaskManager loadFromFile(File file) throws ManagerLoadException {
+    static FileBackedTaskManager loadFromFile(File file) throws LoadException {
         FileBackedTaskManager manager;
         manager = new FileBackedTaskManager(file.getAbsolutePath());
 
@@ -147,7 +147,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                                     Task.DATE_TIME_FORMATTER);
                         }
                     } catch (DateTimeParseException e) {
-                        throw new ManagerLoadException("Ошибка чтения времени из файла. "
+                        throw new LoadException("Ошибка чтения времени из файла. "
                                 + e.getMessage(), file.getAbsolutePath().toString());
                     }
                     if (tokens[2].toLowerCase().equals("null")) {
@@ -188,7 +188,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 }
             }
         } catch (IOException e) {
-            throw new ManagerLoadException("Ошибка загрузки данных из файла. "
+            throw new LoadException("Ошибка загрузки данных из файла. "
                     + e.getMessage(), file.getAbsolutePath().toString());
         } finally {
             manager.setLoadFlag(false); // сбрасываем признак выполнения загрузки

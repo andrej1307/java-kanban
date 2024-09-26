@@ -1,9 +1,9 @@
-package ManagerExceptions;
+package Manager.Exceptions;
 
-public class ManagerLoadException extends RuntimeException {
+public class LoadException extends RuntimeException {
     private final String filename;
 
-    public ManagerLoadException(final String text, final String filename) {
+    public LoadException(final String text, final String filename) {
         super(text);
         this.filename = filename;
     }

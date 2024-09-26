@@ -1,4 +1,4 @@
-package ManagerExceptions;
+package Manager.Exceptions;
 
 public class TaskCrossTimeException extends RuntimeException {
     private final String existsTasks;
