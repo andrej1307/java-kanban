@@ -212,6 +212,8 @@ public class InMemoryTaskManager implements TaskManager {
             return;
         }
         for (Integer idSubtask : epicList.get(epicId).getSubtasks()) {
+            Task task = subtaskList.get(idSubtask);
+            tasksSortedByTime.remove(task);
             subtaskList.remove(idSubtask);
             viewHistory.remove(idSubtask);
         }
@@ -267,13 +269,10 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void removeAllEpics() {
         for (Epic epic : epicList.values()) {
-            for (int subtaskId : epic.getSubtasks()) {
-                viewHistory.remove(subtaskId);
-            }
             viewHistory.remove(epic.getId());
         }
+        removeAllSubtasks();
         epicList.clear();
-        subtaskList.clear();
     }
 
     // Удаление всех объектов класса Subtask
