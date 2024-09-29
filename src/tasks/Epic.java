@@ -8,6 +8,7 @@ import java.util.List;
 public class Epic extends Task {
     private List<Integer> subtaskList;
     private LocalDateTime endTime;
+    private Duration duration;
 
     // конструктор с параметрами "имя", "описание"
     public Epic(String title, String description) {
@@ -97,13 +98,13 @@ public class Epic extends Task {
     public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
     }
-
+/*
     @Override
     public Duration getDuration() {
-        if (getStartTime() == null || endTime == null) {
+        if (subtaskList.isEmpty()) {
             return null;
         }
-        return Duration.between(getStartTime(), endTime);
+        return duration;
     }
-
+*/
 }

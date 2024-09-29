@@ -4,6 +4,7 @@ import tasks.Subtask;
 import tasks.Task;
 import tasks.TaskStatus;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -194,6 +195,8 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeTask(Integer taskId) {
+        Task task = taskList.get(taskId);
+        tasksSortedByTime.remove(task);
         taskList.remove(taskId);
         viewHistory.remove(taskId);
     }
@@ -225,6 +228,9 @@ public class InMemoryTaskManager implements TaskManager {
      */
     @Override
     public void removeSubtask(Integer subtaskId) {
+        Task task = subtaskList.get(subtaskId);
+        tasksSortedByTime.remove(task);
+
         Integer epicId = subtaskList.get(subtaskId).getEpicId();
         epicList.get(epicId).removeSubtask(subtaskId);
         subtaskList.remove(subtaskId);
@@ -251,6 +257,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void removeAllTasks() {
         for (Task task : taskList.values()) {
+            tasksSortedByTime.remove(task);
             viewHistory.remove(task.getId());
         }
         taskList.clear();
@@ -277,6 +284,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
         for (Subtask subtask : subtaskList.values()) {
             viewHistory.remove(subtask.getId());
+            tasksSortedByTime.remove(subtask);
         }
         subtaskList.clear();
     }
@@ -338,26 +346,32 @@ public class InMemoryTaskManager implements TaskManager {
      * @param epicId - идентификатор эпика
      */
     private void setEpicTime(Integer epicId) {
+        Subtask subtask;
         LocalDateTime minDateTime;
         LocalDateTime finishTime;
+        int minutesOfDuration = 0;
 
         Epic epic = epicList.get(epicId);
         List<Integer> subtasks = epic.getSubtasks();
-        if (subtasks.size() > 0) {
-            minDateTime = subtaskList.get(subtasks.get(0)).getStartTime();
-            finishTime = subtaskList.get(subtasks.get(0)).getEndTime();
-        } else {
+        if (subtasks.isEmpty()) {
             epic.setStartTime(null);
             epic.setEndTime(null);
             epic.setDuration(null);
             return;
+        } else {
+            subtask = subtaskList.get(subtasks.get(0));
+            minDateTime = subtask.getStartTime();
+            finishTime = subtask.getEndTime();
         }
 
-        for (Integer subtaskId : subtasks) {
-            LocalDateTime subtaskStartTime = subtaskList.get(subtaskId).getStartTime();
-            LocalDateTime subtaskEndTime = subtaskList.get(subtaskId).getEndTime();
+        for (int subtaskId : subtasks) {
+            subtask = subtaskList.get(subtaskId);
+            LocalDateTime subtaskStartTime = subtask.getStartTime();
+            LocalDateTime subtaskEndTime = subtask.getEndTime();
+            minutesOfDuration += subtask.getDuration().toMinutes();
+
             if (subtaskStartTime.isBefore(minDateTime)) {
-                minDateTime = subtaskEndTime;
+                minDateTime = subtaskStartTime;
             }
             if (subtaskEndTime.isAfter(finishTime)) {
                 finishTime = subtaskEndTime;
@@ -365,6 +379,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
         epic.setStartTime(minDateTime);
         epic.setEndTime(finishTime);
+        epic.setDuration(Duration.ofMinutes(minutesOfDuration));
     }
 
     /**
@@ -409,13 +424,16 @@ public class InMemoryTaskManager implements TaskManager {
                 .filter((Task existsTask) -> !checkTimeFree(task, existsTask))
                 .collect(Collectors.toList());
 
-        if (crossTime.size() == 0) {
+        if (crossTime.isEmpty()) {
             tasksSortedByTime.put(task, curentTime.format(Task.DATE_TIME_FORMATTER));
         } else {
-            throw new TaskCrossTimeException("Конфликт по времени исполнения.\n "
-                    + task.toString(),
-                    "число конфликтов - " + crossTime.size());
+            String message = "Конфликт по времени исполнения.\n " + task.toString();
+            throw new TaskCrossTimeException(message, "число конфликтов - " + crossTime.size());
         }
+    }
+
+    private void removeFromSortedList(Task task) {
+        tasksSortedByTime.remove(task);
     }
 
     /**
