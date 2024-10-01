@@ -21,7 +21,7 @@ public interface TaskManager {
     Epic getEpic(Integer id);
 
     // Метод получения подзадачи по индексу
-    Subtask getSubtasks(Integer id);
+    Subtask getSubtask(Integer id);
 
     // Метод обновления задачи
     int updateTask(Task task);
@@ -59,4 +59,6 @@ public interface TaskManager {
 
     // просмотр использованных задач
     List<Task> getHistory();
+
+    List<Task> getPrioritizedTasks();
 }

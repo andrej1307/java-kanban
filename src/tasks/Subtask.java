@@ -1,10 +1,21 @@
 
 package tasks;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 public class Subtask extends Task {
     private Integer epicId;
 
-    // При вызове конструктора указание объекта задачи "эпик" обязательно
+    public Subtask(Integer epicId,
+                   String title,
+                   String description,
+                   LocalDateTime startTime,
+                   Duration duration) {
+        super(title, description, startTime, duration);
+        this.epicId = epicId;
+    }
+
     public Subtask(Integer epicId, String title, String description) {
         super(title, description);
         this.epicId = epicId;
@@ -22,12 +33,26 @@ public class Subtask extends Task {
 
     @Override
     public String toString() {
-        return "Subtask{id=" + getId() + ", " +
+        String result = "Subtask{id=" + getId() + ", " +
                 "epic_id=" + epicId + ", " +
-                ", title='" + getTitle() + '\'' +
+                "startTime='";
+        if (getStartTime() == null) {
+            result += "null'";
+        } else {
+            result += getStartTime().format(DATE_TIME_FORMATTER) + '\'';
+        }
+        result += ", duration='";
+        if (getDuration() == null) {
+            result += "null'";
+        } else {
+            result += getDuration().toHours() + ":" + getDuration().toMinutesPart() + '\'';
+        }
+
+        result += ", title='" + getTitle() + '\'' +
                 ", description='" + getDescription() + '\'' +
                 ", status='" + getStatus() + '\'' +
                 '}';
+        return result;
     }
 
     // Чтение идентификатора эпика подзадачи
