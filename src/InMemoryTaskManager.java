@@ -13,7 +13,7 @@ public class InMemoryTaskManager implements TaskManager {
     private final Map<Integer, Task> taskList;
     private final Map<Integer, Epic> epicList;
     private final Map<Integer, Subtask> subtaskList;
-    private Integer idMain = 0;
+    private Integer idMain = 1;
     private final Map<Task, String> tasksSortedByTime;
     private final HistoryManager viewHistory = Managers.getDefaultHistory();
 
@@ -33,9 +33,23 @@ public class InMemoryTaskManager implements TaskManager {
 
     // Метод добавления новой задачи
     @Override
-    public int addNewTask(Task newTask) {
+    public int addNewTask(Task newTask) throws TaskCrossTimeException {
         if (newTask == null) {
             return -1;
+        }
+        if (newTask.getStartTime() == null) {
+            return -2; // Время начала выполнения задачи обязательный параметр
+        }
+        if (newTask.getStatus() == null) {
+            newTask.setStatus(TaskStatus.NEW);
+        }
+        if (newTask.getDuration() == null) {
+            newTask.setDuration(Duration.ofMinutes(15));
+        }
+        int intersections = getTaskIntersectionsNum(newTask);
+        if (intersections > 0) {
+            String message = "Конфликт по времени исполнения. Новая задача:\n " + newTask.toString();
+            throw new TaskCrossTimeException(message, "число конфликтов - " + intersections);
         }
         Integer id = idMain++;
         newTask.setId(id);
@@ -58,13 +72,27 @@ public class InMemoryTaskManager implements TaskManager {
 
     // Метод добавления новой подзадачи
     @Override
-    public int addNewSubtask(Subtask newSubtask) {
+    public int addNewSubtask(Subtask newSubtask)  throws TaskCrossTimeException {
         if (newSubtask == null) {
             return -1;
+        }
+        if (newSubtask.getStartTime() == null) {
+            return -2; // Время начала выполнения задачи обязательный параметр
+        }
+        if (newSubtask.getStatus() == null) {
+            newSubtask.setStatus(TaskStatus.NEW);
+        }
+        if (newSubtask.getDuration() == null) {
+            newSubtask.setDuration(Duration.ofMinutes(15));
         }
         Epic epic = epicList.get(newSubtask.getEpicId());
         if (epic == null) {
             return -2;
+        }
+        int intersections = getTaskIntersectionsNum(newSubtask);
+        if (intersections > 0) {
+            String message = "Конфликт по времени исполнения. Новая подзадача:\n " + newSubtask.toString();
+            throw new TaskCrossTimeException(message, "число конфликтов - " + intersections);
         }
         Integer id = idMain++;
         newSubtask.setId(id);
@@ -107,7 +135,18 @@ public class InMemoryTaskManager implements TaskManager {
 
     // Метод обновления задачи
     @Override
-    public int updateTask(Task task) {
+    public int updateTask(Task task)  throws TaskCrossTimeException {
+        if (task.getStatus() == null) {
+            task.setStatus(TaskStatus.NEW);
+        }
+        if (task.getDuration() == null) {
+            task.setDuration(Duration.ofMinutes(15));
+        }
+        int intersections = getTaskIntersectionsNum(task);
+        if (intersections > 0) {
+            String message = "Конфликт по времени исполнения. Обновление задачи:\n " + task.toString();
+            throw new TaskCrossTimeException(message, "число конфликтов - " + intersections);
+        }
         int id = task.getId();
         taskList.put(id, task);
         addTaskToSortedMap(task);
@@ -118,6 +157,14 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public int updateEpic(Epic newEpic) {
         int id = newEpic.getId();
+        Epic oldEpic = epicList.get(id);
+        if (oldEpic != null) {
+            // перепмсываум идентификаторы подзадач старого эппика в новый
+            for (Integer idSubtask : oldEpic.getSubtasks()) {
+                newEpic.addSubtask(idSubtask);
+            }
+        }
+        // заменяем старый эпик на новый
         epicList.put(id, newEpic);
         newEpic.reloadSubtakList(getEpic(id).getSubtasks());
         setStatusEpic(id);
@@ -134,7 +181,18 @@ public class InMemoryTaskManager implements TaskManager {
      * @return - id обновленно подзадачи, или меньше нуля если произошла ошибка
      */
     @Override
-    public int updateSubtask(Subtask newSubtask) {
+    public int updateSubtask(Subtask newSubtask)  throws TaskCrossTimeException {
+        if (newSubtask.getStatus() == null) {
+            newSubtask.setStatus(TaskStatus.NEW);
+        }
+        if (newSubtask.getDuration() == null) {
+            newSubtask.setDuration(Duration.ofMinutes(15));
+        }
+        int intersections = getTaskIntersectionsNum(newSubtask);
+        if (intersections > 0) {
+            String message = "Конфликт по времени исполнения. Обновление подзадачи:\n " + newSubtask.toString();
+            throw new TaskCrossTimeException(message, "число конфликтов - " + intersections);
+        }
         int id = newSubtask.getId();
         int epicId = newSubtask.getEpicId();
         if (!epicList.containsKey(epicId)) {
@@ -319,14 +377,14 @@ public class InMemoryTaskManager implements TaskManager {
         removeAllTasks();
         removeAllEpics();
         tasksSortedByTime.clear();
-        idMain = 0;
+        idMain = 1;
     }
 
     /**
      * Пересчет идентификатора задач после загрузки данных из файла
      */
     public void resetMainId() {
-        int maxId = 0;
+        int maxId = 1;
         for (int i : taskList.keySet()) {
             if (i > maxId) maxId = i;
         }
@@ -411,28 +469,30 @@ public class InMemoryTaskManager implements TaskManager {
              */
             return;
         }
-
         LocalDateTime curentTime = LocalDateTime.now();
-        if (tasksSortedByTime.size() == 0) {
-            tasksSortedByTime.put(task, curentTime.format(Task.DATE_TIME_FORMATTER));
-            return;
-        }
-
-        // Проверяем пересечение времени добавляемой задачи с существующими задачами
-        List<Task> crossTime = getPrioritizedTasks().stream()
-                .filter((Task existsTask) -> !checkTimeFree(task, existsTask))
-                .collect(Collectors.toList());
-
-        if (crossTime.isEmpty()) {
-            tasksSortedByTime.put(task, curentTime.format(Task.DATE_TIME_FORMATTER));
-        } else {
-            String message = "Конфликт по времени исполнения.\n " + task.toString();
-            throw new TaskCrossTimeException(message, "число конфликтов - " + crossTime.size());
-        }
+        tasksSortedByTime.put(task, curentTime.format(Task.DATE_TIME_FORMATTER));
     }
 
+    /**
+     * Удаление задачи из отсортированного списка
+     * @param task
+     */
     private void removeFromSortedList(Task task) {
         tasksSortedByTime.remove(task);
+    }
+
+    /**
+     * Проверка пересечения времени выполнения задачи с временами задач в отсортированном списке
+     * @param newTask - проверяемая задача
+     * @return - число пересечений по времени с существующими задачами
+     */
+    private int getTaskIntersectionsNum(Task newTask) {
+        // Проверяем пересечение времени добавляемой задачи с существующими задачами
+        List<Task> intersections = getPrioritizedTasks().stream()
+                .filter((Task existsTask) -> !checkTimeFree(newTask, existsTask))
+                .collect(Collectors.toList());
+
+        return intersections.size();
     }
 
     /**
@@ -444,7 +504,7 @@ public class InMemoryTaskManager implements TaskManager {
      */
     private boolean checkTimeFree(Task task1, Task task2) {
         if (task1.equals(task2)) {
-            return true;
+            return true; // пересечение с собой не учитываем (update)
         }
         LocalDateTime task1Start = task1.getStartTime();
         LocalDateTime task1End = task1.getEndTime();
@@ -454,6 +514,5 @@ public class InMemoryTaskManager implements TaskManager {
         return (task2Start.isBefore(task1Start) && task2End.isBefore(task1Start)) ||
                 task2Start.isAfter(task1End);
     }
-
 
 }

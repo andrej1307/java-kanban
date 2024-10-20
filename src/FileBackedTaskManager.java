@@ -12,7 +12,7 @@ import java.time.format.DateTimeParseException;
  */
 public class FileBackedTaskManager extends InMemoryTaskManager {
     private String fileName;
-    private boolean loadInprogres;
+    private boolean loadInprogres = false;
 
     /**
      * Конструктор

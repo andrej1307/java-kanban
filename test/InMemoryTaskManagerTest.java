@@ -80,7 +80,8 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
                 () -> {
                     manager.addNewTask(task);
                 },
-                "Наложение времени задач должно приводить к исключению.");
+                "Наложение времени задач должно приводить к исключению.\n"
+                        + task.toString());
 
         // изменяем период задачи на перекрвыающий окончание существующей задачи
         task.setStartTime(LocalDateTime.now().plusMinutes(30));
@@ -88,7 +89,8 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
                 () -> {
                     manager.addNewTask(task);
                 },
-                "Наложение времени задач должно приводить к исключению.");
+                "Наложение времени задач должно приводить к исключению.\n"
+                        + task.toString());
 
         // изменяем период задачи на вложенный во время выполнения существующей задачи
         task.setDuration(Duration.ofMinutes(5));
@@ -96,7 +98,8 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
                 () -> {
                     manager.addNewTask(task);
                 },
-                "Наложение времени задач должно приводить к исключению.");
+                "Наложение времени задач должно приводить к исключению.\n"
+                        + task.toString());
 
         // изменяем период задачи на перекрвыающий все время выполнения существующей задачи
         task.setStartTime(LocalDateTime.now().plusMinutes(10));
@@ -105,7 +108,8 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
                 () -> {
                     manager.addNewTask(task);
                 },
-                "Наложение времени задач должно приводить к исключению.");
+                "Наложение времени задач должно приводить к исключению.\n"
+                        + task.toString());
     }
 
     /**

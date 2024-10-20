@@ -18,7 +18,7 @@ public class Main {
 
         System.out.println("\nПроверяем статус эпика : " + manager.getEpic(6).toString());
 
-        System.out.println("\nПроверяем статус задачи : " + manager.getTask(0).toString());
+        System.out.println("\nПроверяем статус задачи : " + manager.getTask(1).toString());
 
         System.out.println("\nПроверяем статус подзадачи : " + manager.getSubtask(5).toString());
 

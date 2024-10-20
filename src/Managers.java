@@ -6,7 +6,13 @@ public final class Managers {
 
     // определение объекта меджера задач
     public static TaskManager getDefault() {
-        return new FileBackedTaskManager();
+/*        FileBackedTaskManager manager =
+                FileBackedTaskManager.loadFromFile(new File (".\\data\\tasks.csv"));
+
+        manager.setSaveFileName(".\\data\\taskSave.csv"); */
+
+        InMemoryTaskManager manager = new InMemoryTaskManager();
+        return manager;
     }
 
     // определение объекта журнала событий
