@@ -1,19 +1,12 @@
-import adapters.DurationAdapter;
 import adapters.JsFormatter;
-import adapters.LocalDateTimeAdapter;
-import adapters.TaskStatusAdapter;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import exceptions.TaskCrossTimeException;
 import tasks.Task;
-import tasks.TaskStatus;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 

@@ -1,17 +1,10 @@
-import adapters.DurationAdapter;
 import adapters.JsFormatter;
-import adapters.LocalDateTimeAdapter;
-import adapters.TaskStatusAdapter;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import tasks.Task;
-import tasks.TaskStatus;
 
 import java.io.IOException;
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.List;
 
 public class HttpHistoryHandler extends BaseHttpHandler implements HttpHandler {
