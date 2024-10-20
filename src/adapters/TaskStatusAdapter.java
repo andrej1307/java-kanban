@@ -10,7 +10,7 @@ import java.io.IOException;
 public class TaskStatusAdapter extends TypeAdapter<TaskStatus> {
     @Override
     public void write(final JsonWriter jsonWriter, final TaskStatus taskStatus) throws IOException {
-        if(taskStatus == null) {
+        if (taskStatus == null) {
             jsonWriter.value(TaskStatus.NEW.toString());
             return;
         }
