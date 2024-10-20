@@ -88,7 +88,7 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
                 Duration.ofMinutes(15)));
 
         // удаляем первую задачу что бы внести путаницу в идентификаторы
-        manager.removeTask(0);
+        manager.removeTask(1);
 
         tmpFile = new File(filename);
         FileBackedTaskManager manager2 = FileBackedTaskManager.loadFromFile(tmpFile);
@@ -112,7 +112,7 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
                 "task3",
                 LocalDateTime.now().plusMinutes(80),
                 Duration.ofMinutes(15)));
-        assertEquals(4, taskId,
+        assertEquals(5, taskId,
                 "Некорректный счетчмк идентификаторов после загрузки файла.");
     }
 
@@ -145,8 +145,11 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
             tmpFile.createNewFile(); // создаем пустой файл
             manager2 = FileBackedTaskManager.loadFromFile(tmpFile);
             assertNotNull(manager2, "Ошибка создания менеджера задач.");
+
             int taskId = manager2.addNewTask(new Task("Task 1",
-                    "Description task 1"));
+                    "Description task 1",
+                    LocalDateTime.now(),
+                    Duration.ofMinutes(15)));
             assertEquals(1, manager2.getNumberOfObjects(),
                     "Ошибка работы с созданным менеджером.");
         } catch (IOException e) {
