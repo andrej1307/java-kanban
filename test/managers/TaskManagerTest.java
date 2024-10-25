@@ -1,3 +1,6 @@
+package managers;
+
+import exceptions.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tasks.Epic;
@@ -190,10 +193,17 @@ abstract class TaskManagerTest<T extends TaskManager> {
                 "-",
                 LocalDateTime.now(),
                 Duration.ofMinutes(10)));
-        manager.removeTask(taskId);
-        Task task = manager.getTask(taskId);
 
-        assertNull(task, "Задача не удалена.");
+        assertTrue(!manager.getTaskList().isEmpty(),
+                "Отсутствует задача для удаления.");
+
+        manager.removeTask(taskId);
+
+        assertThrows(NotFoundException.class,
+                () -> {
+                    manager.getTask(taskId);
+                },
+                "Попытка чтения несуществующей задачи должна приводить к исключению.");
     }
 
     @Test
@@ -206,13 +216,21 @@ abstract class TaskManagerTest<T extends TaskManager> {
                 LocalDateTime.now(),
                 Duration.ofMinutes(30)));
 
+        assertTrue(!manager.getEpicList().isEmpty(),
+                "Отсутствует эпик для удаления.");
+
         manager.removeEpic(epicId);
 
-        Epic epic = manager.getEpic(epicId);
-        Subtask subtask = manager.getSubtask(subtaskId);
-
-        assertNull(epic, "Эпик не удален.");
-        assertNull(subtask, "Подзадача удаленного эпика не удалена.");
+        assertThrows(NotFoundException.class,
+                () -> {
+                    manager.getEpic(epicId);
+                },
+                "Попытка чтения несуществующго эпика должна приводить к исключению.");
+        assertThrows(NotFoundException.class,
+                () -> {
+                    manager.getSubtask(subtaskId);
+                },
+                "Попытка чтения несуществующей подзадачи должна приводить к исключению.");
     }
 
     @Test
@@ -225,11 +243,16 @@ abstract class TaskManagerTest<T extends TaskManager> {
                 LocalDateTime.now(),
                 Duration.ofMinutes(30)));
 
+        assertTrue(!manager.getSubtaskList().isEmpty(),
+                "Отсутствует подзадача для удаления.");
+
         manager.removeSubtask(subtaskId);
 
-        Subtask subtask = manager.getSubtask(subtaskId);
-
-        assertNull(subtask, "Подзадача не удалена.");
+        assertThrows(NotFoundException.class,
+                () -> {
+                    manager.getSubtask(subtaskId);
+                },
+                "Попытка чтения несуществующей подзадачи должна приводить к исключению.");
     }
 
     @Test
@@ -292,9 +315,16 @@ abstract class TaskManagerTest<T extends TaskManager> {
         manager.addNewTask(new Task("Test removeAllTasks task2",
                 "2", LocalDateTime.now().plusMinutes(40), Duration.ofMinutes(30)));
 
+        assertTrue(!manager.getTaskList().isEmpty(),
+                "Отсутствуют задачи для удаления.");
+
         manager.removeAllTasks();
 
-        assertTrue(manager.getTaskList().isEmpty(), "Задачи не удалены.");
+        assertThrows(NotFoundException.class,
+                () -> {
+                    manager.getTaskList();
+                },
+                "Попытка чтения пустого списка задач должна приводить к исключению.");
     }
 
     @Test
@@ -307,11 +337,16 @@ abstract class TaskManagerTest<T extends TaskManager> {
                 "Test removeAllEpics Subtask1",
                 "1", LocalDateTime.now(), Duration.ofMinutes(30)));
 
+        assertTrue(!manager.getEpicList().isEmpty(),
+                "Отсутствуют эпики для удаления.");
+
         manager.removeAllEpics();
 
-        assertTrue(manager.getEpicList().isEmpty(), "Эпики не удалены.");
-        assertTrue(manager.getSubtaskList().isEmpty(),
-                "Подзадачи удаленных эпиков не удалены.");
+        assertThrows(NotFoundException.class,
+                () -> {
+                    manager.getEpicList();
+                },
+                "Попытка чтения пустого списка эпиков должна приводить к исключению.");
     }
 
     @Test
@@ -331,15 +366,23 @@ abstract class TaskManagerTest<T extends TaskManager> {
                 "Test removeAllSubtasks Subtask3",
                 "3", LocalDateTime.now().plusMinutes(80), Duration.ofMinutes(30)));
 
+        assertTrue(!manager.getSubtaskList().isEmpty(),
+                "Отсутствуют подзадачи для удаления.");
+
         manager.removeAllSubtasks();
 
-        assertTrue(manager.getSubtaskList().isEmpty(), "Подзадачи не удалены.");
         assertTrue(manager.getEpic(epicId).getSubtasks().isEmpty(),
                 "не удалены идениификаторы подзадач эпика:\n"
                         + manager.getEpic(epicId).toString());
         assertTrue(manager.getEpic(epicId2).getSubtasks().isEmpty(),
                 "не удалены идениификаторы подзадач эпика:\n"
                         + manager.getEpic(epicId2).toString());
+
+        assertThrows(NotFoundException.class,
+                () -> {
+                    manager.getSubtaskList();
+                },
+                "Попытка чтения пустого списка подзадач должна приводить к исключению.");
     }
 
     @Test

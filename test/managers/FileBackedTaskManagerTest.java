@@ -1,3 +1,5 @@
+package managers;
+
 import exceptions.LoadException;
 import exceptions.SaveException;
 import org.junit.jupiter.api.AfterEach;
@@ -122,7 +124,10 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
     @Test
     void saveAndLoadEmptyManager() {
         int taskId = manager.addNewTask(new Task("Task 1",
-                "Description task 1"));
+                "Description task 1",
+                LocalDateTime.now(),
+                Duration.ofMinutes(15)));
+
         manager.removeTask(taskId);
         assertEquals(0, manager.getNumberOfObjects(),
                 "Список задач не пуст.");

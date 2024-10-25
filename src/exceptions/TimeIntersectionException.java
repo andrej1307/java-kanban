@@ -1,9 +1,9 @@
 package exceptions;
 
-public class TaskCrossTimeException extends RuntimeException {
+public class TimeIntersectionException extends RuntimeException {
     private final String existsTasks;
 
-    public TaskCrossTimeException(final String text, final String existsTasks) {
+    public TimeIntersectionException(final String text, final String existsTasks) {
         super(text);
         this.existsTasks = existsTasks;
     }

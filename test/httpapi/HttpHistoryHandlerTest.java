@@ -1,5 +1,8 @@
-import com.google.gson.Gson;
+package httpapi;
+
 import com.google.gson.reflect.TypeToken;
+import managers.InMemoryTaskManager;
+import managers.TaskManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +25,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class HttpHistoryHandlerTest {
     TaskManager manager = new InMemoryTaskManager();
     HttpTaskServer taskServer = new HttpTaskServer(manager);
-    Gson gson = taskServer.getGson();
 
     @BeforeEach
     void setUp() throws IOException {
@@ -77,7 +79,7 @@ class HttpHistoryHandlerTest {
                 "Чтение истории задач: неожиданный код ответа сервера");
 
         if (response.statusCode() == 200) {
-            List<Task> historyFromServer = gson.fromJson(response.body(),
+            List<Task> historyFromServer = HttpTaskServer.gson.fromJson(response.body(),
                     new HistoryListTypeToken().getType());
 
             assertNotNull(historyFromServer,

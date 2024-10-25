@@ -1,7 +1,11 @@
+package httpapi;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
+import managers.InMemoryTaskManager;
+import managers.TaskManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,8 +26,6 @@ import static org.junit.jupiter.api.Assertions.*;
 class HttpSubtasksHandlerTest {
     TaskManager manager = new InMemoryTaskManager();
     HttpTaskServer taskServer = new HttpTaskServer(manager);
-    Gson gson = taskServer.getGson();
-
 
     @BeforeEach
     void setUp() throws IOException {
@@ -50,7 +52,7 @@ class HttpSubtasksHandlerTest {
                 LocalDateTime.now(),
                 Duration.ofMinutes(15));
 
-        String subtaskJson = gson.toJson(subtask);
+        String subtaskJson = HttpTaskServer.gson.toJson(subtask);
 
         // создаём HTTP-клиент и запрос
         HttpClient client = HttpClient.newHttpClient();
@@ -98,7 +100,7 @@ class HttpSubtasksHandlerTest {
                 Duration.ofMinutes(15));
         subtask.setId(subtaskId);
 
-        String subtaskJson = gson.toJson(subtask);
+        String subtaskJson = HttpTaskServer.gson.toJson(subtask);
 
         // создаём HTTP-клиент и запрос
         HttpClient client = HttpClient.newHttpClient();
@@ -151,7 +153,7 @@ class HttpSubtasksHandlerTest {
             assertTrue(jsonElement.isJsonObject(),
                     "Ошибка чтения ответа сервера.");
             Subtask newSubtask = null;
-            newSubtask = gson.fromJson(jsonElement, Subtask.class);
+            newSubtask = HttpTaskServer.gson.fromJson(jsonElement, Subtask.class);
             assertNotNull(newSubtask, "Ошибка десериализации подзадачи.");
             assertEquals(2, newSubtask.getId(),
                     "Неожиданный идентификатор подзадачи");
@@ -183,7 +185,7 @@ class HttpSubtasksHandlerTest {
                 "Чтение подзадач: неожиданный код ответа сервера");
 
         if (response.statusCode() == 200) {
-            List<Subtask> subtaskListFromServer = gson.fromJson(response.body(),
+            List<Subtask> subtaskListFromServer = HttpTaskServer.gson.fromJson(response.body(),
                     new SubtaskListTypeToken().getType());
 
             assertNotNull(subtaskListFromServer,
@@ -250,7 +252,7 @@ class HttpSubtasksHandlerTest {
                 LocalDateTime.now(),
                 Duration.ofMinutes(15));
 
-        String subtaskJson = gson.toJson(subtask);
+        String subtaskJson = HttpTaskServer.gson.toJson(subtask);
 
         // создаём HTTP-клиент и запрос
         HttpClient client = HttpClient.newHttpClient();

@@ -1,4 +1,7 @@
-import exceptions.TaskCrossTimeException;
+package managers;
+
+import exceptions.NotFoundException;
+import exceptions.TimeIntersectionException;
 import tasks.Epic;
 import tasks.Subtask;
 import tasks.Task;
@@ -10,14 +13,14 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class InMemoryTaskManager implements TaskManager {
-    private final Map<Integer, Task> taskList;
-    private final Map<Integer, Epic> epicList;
-    private final Map<Integer, Subtask> subtaskList;
+    protected final Map<Integer, Task> taskList;
+    protected final Map<Integer, Epic> epicList;
+    protected final Map<Integer, Subtask> subtaskList;
     private Integer idMain = 1;
     private final Map<Task, String> tasksSortedByTime;
     private final HistoryManager viewHistory = Managers.getDefaultHistory();
 
-    // компаратор для упоорядочивания задач по ремени запуска,
+    // Компаратор для упоорядочивания задач по ремени запуска,
     // а при совпадении по возрастанию идентификатора.
     // Задачи с временем null помещаются в начало.
     private final Comparator<Task> taskComparator = Comparator.comparing(Task::getStartTime,
@@ -33,7 +36,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     // Метод добавления новой задачи
     @Override
-    public int addNewTask(Task newTask) throws TaskCrossTimeException {
+    public int addNewTask(Task newTask) throws TimeIntersectionException {
         if (newTask == null) {
             return -1;
         }
@@ -49,7 +52,7 @@ public class InMemoryTaskManager implements TaskManager {
         int intersections = getTaskIntersectionsNum(newTask);
         if (intersections > 0) {
             String message = "Конфликт по времени исполнения. Новая задача:\n " + newTask.toString();
-            throw new TaskCrossTimeException(message, "число конфликтов - " + intersections);
+            throw new TimeIntersectionException(message, "число конфликтов - " + intersections);
         }
         Integer id = idMain++;
         newTask.setId(id);
@@ -72,7 +75,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     // Метод добавления новой подзадачи
     @Override
-    public int addNewSubtask(Subtask newSubtask)  throws TaskCrossTimeException {
+    public int addNewSubtask(Subtask newSubtask)  throws TimeIntersectionException {
         if (newSubtask == null) {
             return -1;
         }
@@ -92,7 +95,7 @@ public class InMemoryTaskManager implements TaskManager {
         int intersections = getTaskIntersectionsNum(newSubtask);
         if (intersections > 0) {
             String message = "Конфликт по времени исполнения. Новая подзадача:\n " + newSubtask.toString();
-            throw new TaskCrossTimeException(message, "число конфликтов - " + intersections);
+            throw new TimeIntersectionException(message, "число конфликтов - " + intersections);
         }
         Integer id = idMain++;
         newSubtask.setId(id);
@@ -111,31 +114,40 @@ public class InMemoryTaskManager implements TaskManager {
 
     // Метод получения задачи по индексу
     @Override
-    public Task getTask(Integer id) {
+    public Task getTask(Integer id) throws NotFoundException {
         Task task = taskList.get(id);
+        if (task == null) {
+            throw new NotFoundException("Задача не найдена", "id=" + id);
+        }
         viewHistory.add(task);
         return task;
     }
 
     // Метод получения эпика по индексу
     @Override
-    public Epic getEpic(Integer id) {
+    public Epic getEpic(Integer id) throws NotFoundException {
         Epic epic = epicList.get(id);
+        if (epic == null) {
+            throw new NotFoundException("Эпик не найден", "id=" + id);
+        }
         viewHistory.add(epic);
         return epic;
     }
 
     // Метод получения подзадачи по индексу
     @Override
-    public Subtask getSubtask(Integer id) {
+    public Subtask getSubtask(Integer id) throws NotFoundException {
         Subtask s = subtaskList.get(id);
+        if (s == null) {
+            throw new NotFoundException("Подзадача не найдена", "id=" + id);
+        }
         viewHistory.add(s);
         return s;
     }
 
     // Метод обновления задачи
     @Override
-    public int updateTask(Task task)  throws TaskCrossTimeException {
+    public int updateTask(Task task)  throws TimeIntersectionException {
         if (task.getStatus() == null) {
             task.setStatus(TaskStatus.NEW);
         }
@@ -145,7 +157,7 @@ public class InMemoryTaskManager implements TaskManager {
         int intersections = getTaskIntersectionsNum(task);
         if (intersections > 0) {
             String message = "Конфликт по времени исполнения. Обновление задачи:\n " + task.toString();
-            throw new TaskCrossTimeException(message, "число конфликтов - " + intersections);
+            throw new TimeIntersectionException(message, "число конфликтов - " + intersections);
         }
         int id = task.getId();
         taskList.put(id, task);
@@ -181,7 +193,7 @@ public class InMemoryTaskManager implements TaskManager {
      * @return - id обновленно подзадачи, или меньше нуля если произошла ошибка
      */
     @Override
-    public int updateSubtask(Subtask newSubtask)  throws TaskCrossTimeException {
+    public int updateSubtask(Subtask newSubtask)  throws TimeIntersectionException {
         if (newSubtask.getStatus() == null) {
             newSubtask.setStatus(TaskStatus.NEW);
         }
@@ -191,7 +203,7 @@ public class InMemoryTaskManager implements TaskManager {
         int intersections = getTaskIntersectionsNum(newSubtask);
         if (intersections > 0) {
             String message = "Конфликт по времени исполнения. Обновление подзадачи:\n " + newSubtask.toString();
-            throw new TaskCrossTimeException(message, "число конфликтов - " + intersections);
+            throw new TimeIntersectionException(message, "число конфликтов - " + intersections);
         }
         int id = newSubtask.getId();
         int epicId = newSubtask.getEpicId();
@@ -216,7 +228,7 @@ public class InMemoryTaskManager implements TaskManager {
         Epic epic = epicList.get(epicId);
         setEpicTime(epicId);
 
-        if (epic.getSubtasks().isEmpty()) {
+        if (subtaskList.isEmpty() || epic.getSubtasks().isEmpty()) {
             epic.setStatus(TaskStatus.NEW);
             return;
         }
@@ -252,8 +264,12 @@ public class InMemoryTaskManager implements TaskManager {
 
 
     @Override
-    public void removeTask(Integer taskId) {
+    public void removeTask(Integer taskId) throws NotFoundException {
         Task task = taskList.get(taskId);
+        if (task == null) {
+            throw new NotFoundException("Задача не найдена",
+                    "id=" + taskId);
+        }
         tasksSortedByTime.remove(task);
         taskList.remove(taskId);
         viewHistory.remove(taskId);
@@ -265,9 +281,9 @@ public class InMemoryTaskManager implements TaskManager {
      * @param epicId- идентификатор объекта
      */
     @Override
-    public void removeEpic(Integer epicId) {
+    public void removeEpic(Integer epicId) throws NotFoundException {
         if (!epicList.containsKey(epicId)) {
-            return;
+            throw new NotFoundException("Эпик не найден", "id=" + epicId);
         }
         for (Integer idSubtask : epicList.get(epicId).getSubtasks()) {
             Task task = subtaskList.get(idSubtask);
@@ -281,13 +297,17 @@ public class InMemoryTaskManager implements TaskManager {
 
     /**
      * Удаление подзадачи по идентификатору
-     * Удаляем предварительно из спика соответствующего эпика
+     * удаляем предварительно из спика соответствующего эпика
      * и из общего списка позадач.
      *
      * @param subtaskId - идентификатор подзадачи
      */
     @Override
-    public void removeSubtask(Integer subtaskId) {
+    public void removeSubtask(Integer subtaskId) throws NotFoundException {
+        if (subtaskList.isEmpty()) {
+            throw new NotFoundException("подзадача не найдена",
+                    "id=" + subtaskId);
+        }
         Task task = subtaskList.get(subtaskId);
         tasksSortedByTime.remove(task);
 
@@ -299,17 +319,26 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public List<Task> getTaskList() {
+    public List<Task> getTaskList() throws NotFoundException {
+        if (taskList.isEmpty()) {
+            throw new NotFoundException("Информация не найдена.", "Список задач пуст.");
+        }
         return new ArrayList<>(taskList.values());
     }
 
     @Override
-    public List<Epic> getEpicList() {
+    public List<Epic> getEpicList() throws NotFoundException {
+        if (epicList.isEmpty()) {
+            throw new NotFoundException("Информация не найдена.", "Список эпиков пуст.");
+        }
         return new ArrayList<>(epicList.values());
     }
 
     @Override
-    public ArrayList<Subtask> getSubtaskList() {
+    public ArrayList<Subtask> getSubtaskList() throws NotFoundException {
+        if (subtaskList.isEmpty()) {
+            throw new NotFoundException("Информация не найдена.", "Список лодзадач пуст.");
+        }
         return new ArrayList<>(subtaskList.values());
     }
 
@@ -336,7 +365,7 @@ public class InMemoryTaskManager implements TaskManager {
     // Удаление всех объектов класса Subtask
     @Override
     public void removeAllSubtasks() {
-        for (Epic epic : getEpicList()) {
+        for (Epic epic : epicList.values()) {
             epic.removeAllSubtasks();
         }
         for (Subtask subtask : subtaskList.values()) {
@@ -353,12 +382,15 @@ public class InMemoryTaskManager implements TaskManager {
      * @return - список подзадач
      */
     @Override
-    public List<Subtask> getSubtasksByEpic(Integer epicId) {
+    public List<Subtask> getSubtasksByEpic(Integer epicId) throws NotFoundException{
         List<Subtask> subtasks = new ArrayList<>();
 
         subtasks = subtaskList.values().stream()
                 .filter((Subtask subtask) -> subtask.getEpicId() == epicId)
                 .collect(Collectors.toList());
+        if (subtasks.isEmpty()) {
+            throw new NotFoundException("Информация не найдена.", "Список лодзадач пуст.");
+        }
         return subtasks;
     }
 
@@ -368,15 +400,24 @@ public class InMemoryTaskManager implements TaskManager {
      * @return - возвращает список использованных объектов
      */
     @Override
-    public List<Task> getHistory() {
+    public List<Task> getHistory() throws NotFoundException {
+        if (viewHistory.getHistory().isEmpty()) {
+            throw new NotFoundException("Информация не найдена.", "История отсутствует.");
+        }
         return viewHistory.getHistory();
     }
 
     // очистка всех задач и эпиков
     public void clear() {
-        removeAllTasks();
-        removeAllEpics();
-        tasksSortedByTime.clear();
+        if (!taskList.isEmpty()) {
+            removeAllTasks();
+        }
+        if (!epicList.isEmpty()) {
+            removeAllEpics();
+        }
+        if (!tasksSortedByTime.isEmpty()) {
+            tasksSortedByTime.clear();
+        }
         idMain = 1;
     }
 
@@ -445,8 +486,11 @@ public class InMemoryTaskManager implements TaskManager {
      * @return - отсортированный список
      */
     @Override
-    public List<Task> getPrioritizedTasks() {
+    public List<Task> getPrioritizedTasks()  throws NotFoundException {
 
+        if (tasksSortedByTime.isEmpty()) {
+            throw new NotFoundException("Информация не найдена", "список задач пуст" );
+        }
         List<Task> sortedTaskList = new ArrayList<>();
 
         for (Map.Entry<Task, String> entry : tasksSortedByTime.entrySet()) {
@@ -488,6 +532,9 @@ public class InMemoryTaskManager implements TaskManager {
      */
     private int getTaskIntersectionsNum(Task newTask) {
         // Проверяем пересечение времени добавляемой задачи с существующими задачами
+        if (tasksSortedByTime.isEmpty()) {
+            return 0;
+        }
         List<Task> intersections = getPrioritizedTasks().stream()
                 .filter((Task existsTask) -> !checkTimeFree(newTask, existsTask))
                 .collect(Collectors.toList());

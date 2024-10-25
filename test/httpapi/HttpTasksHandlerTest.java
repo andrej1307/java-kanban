@@ -1,18 +1,20 @@
+package httpapi;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.google.gson.reflect.TypeToken;
+import managers.InMemoryTaskManager;
+import managers.TaskManager;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import tasks.Task;
+
+import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import com.google.gson.reflect.TypeToken;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import tasks.Subtask;
-import tasks.Task;
-
-import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,7 +24,6 @@ import static org.junit.jupiter.api.Assertions.*;
 class HttpTasksHandlerTest {
     TaskManager manager = new InMemoryTaskManager();
     HttpTaskServer taskServer = new HttpTaskServer(manager);
-    Gson gson = taskServer.getGson();
 
     public HttpTasksHandlerTest() {
     }
@@ -44,12 +45,12 @@ class HttpTasksHandlerTest {
      */
     @Test
     public void testAddTask() throws IOException, InterruptedException {
-        Task task = new Task( "Test AddTask",
+        Task task = new Task("Test AddTask",
                 "Testing AddTask",
                 LocalDateTime.now(),
                 Duration.ofMinutes(15));
 
-        String taskJson = gson.toJson(task);
+        String taskJson = HttpTaskServer.gson.toJson(task);
 
         // создаём HTTP-клиент и запрос
         HttpClient client = HttpClient.newHttpClient();
@@ -84,12 +85,12 @@ class HttpTasksHandlerTest {
         // добавляем задачу
         makeTaskList(1);
 
-        Task task = new Task( "Test UpdateTask",
+        Task task = new Task("Test UpdateTask",
                 "Testing UpdateTask",
                 LocalDateTime.now(),
                 Duration.ofMinutes(15));
 
-        String taskJson = gson.toJson(task);
+        String taskJson = HttpTaskServer.gson.toJson(task);
 
         // создаём HTTP-клиент и запрос
         HttpClient client = HttpClient.newHttpClient();
@@ -145,7 +146,7 @@ class HttpTasksHandlerTest {
             assertTrue(jsonElement.isJsonObject(),
                     "Ошибка чтения ответа сервера.");
             Task newTask = null;
-            newTask = gson.fromJson(jsonElement, Task.class);
+            newTask = HttpTaskServer.gson.fromJson(jsonElement, Task.class);
             assertNotNull(newTask, "Ошибка десериализации задачи.");
             assertEquals(1, newTask.getId(),
                     "Неожиданный идентификатор задачи");
@@ -162,7 +163,7 @@ class HttpTasksHandlerTest {
      * Тестируем чтение списка задач через HTTP сервер
      */
     @Test
-    public void testGetTasks()  throws IOException, InterruptedException {
+    public void testGetTasks() throws IOException, InterruptedException {
         // создаем список задач в менеджере
         makeTaskList(3);
 
@@ -182,7 +183,7 @@ class HttpTasksHandlerTest {
                 "Чтение списка задач: неожиданный код ответа сервера");
 
         if (response.statusCode() == 200) {
-            List<Task> taskListFromServer = gson.fromJson(response.body(), new TaskListTypeToken().getType());
+            List<Task> taskListFromServer = HttpTaskServer.gson.fromJson(response.body(), new TaskListTypeToken().getType());
 
             assertNotNull(taskListFromServer,
                     "Список задач не прочитан.");
@@ -229,12 +230,12 @@ class HttpTasksHandlerTest {
         makeTaskList(3);
 
         // создаем задачу с текущим временем
-        Task task = new Task( "Test TimeIntersection",
+        Task task = new Task("Test TimeIntersection",
                 "Testing TimeIntersection",
                 LocalDateTime.now(),
                 Duration.ofMinutes(15));
 
-        String taskJson = gson.toJson(task);
+        String taskJson = HttpTaskServer.gson.toJson(task);
 
         // создаём HTTP-клиент и запрос
         HttpClient client = HttpClient.newHttpClient();
@@ -283,7 +284,7 @@ class HttpTasksHandlerTest {
                 LocalDateTime.now(),
                 Duration.ofMinutes(15));
 
-        String taskJson = gson.toJson(task);
+        String taskJson = HttpTaskServer.gson.toJson(task);
 
         // создаём HTTP-клиент и запрос
         HttpClient client = HttpClient.newHttpClient();
@@ -307,13 +308,13 @@ class HttpTasksHandlerTest {
      * @param size - число генерируемых задач
      */
     private void makeTaskList(int size) {
-        if(size == 0) {
+        if (size == 0) {
             return;
         }
-        for (int i = 0; i < size; i ++) {
+        for (int i = 0; i < size; i++) {
             manager.addNewTask(new Task("taskList element:" + i,
                     "Testing taskList",
-                    LocalDateTime.now().plusMinutes(20L *i),
+                    LocalDateTime.now().plusMinutes(20L * i),
                     Duration.ofMinutes(10)));
         }
     }

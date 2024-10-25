@@ -1,9 +1,13 @@
+package httpapi;
+
 import adapters.DurationAdapter;
 import adapters.LocalDateTimeAdapter;
 import adapters.TaskStatusAdapter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpServer;
+import managers.Managers;
+import managers.TaskManager;
 import tasks.TaskStatus;
 
 import java.io.IOException;
@@ -16,17 +20,15 @@ public class HttpTaskServer {
     private static HttpServer httpServer;
     private static TaskManager manager = Managers.getDefault();
 
+    public static Gson gson = new GsonBuilder()
+            .setPrettyPrinting()
+            .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+            .registerTypeAdapter(Duration.class, new DurationAdapter())
+            .registerTypeAdapter(TaskStatus.class, new TaskStatusAdapter())
+            .create();
+
     public HttpTaskServer(TaskManager manager) {
         this.manager = manager;
-    }
-
-    public Gson getGson() {
-        return new GsonBuilder()
-                .setPrettyPrinting()
-                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
-                .registerTypeAdapter(Duration.class, new DurationAdapter())
-                .registerTypeAdapter(TaskStatus.class, new TaskStatusAdapter())
-                .create();
     }
 
     public static void start() throws IOException {

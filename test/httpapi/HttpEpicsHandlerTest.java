@@ -1,7 +1,11 @@
+package httpapi;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
+import managers.InMemoryTaskManager;
+import managers.TaskManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,9 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class HttpEpicsHandlerTest {
     TaskManager manager = new InMemoryTaskManager();
     HttpTaskServer taskServer = new HttpTaskServer(manager);
-    Gson gson = taskServer.getGson();
-
-
+ 
     @BeforeEach
     void setUp()  throws IOException {
         manager.removeAllTasks();
@@ -45,7 +47,7 @@ class HttpEpicsHandlerTest {
         Epic epic = new Epic("Test AddEpic",
                 "Teting AddNewEpic");
 
-        String epicJson = gson.toJson(epic);
+        String epicJson = HttpTaskServer.gson.toJson(epic);
 
         // создаём HTTP-клиент и запрос
         HttpClient client = HttpClient.newHttpClient();
@@ -84,7 +86,7 @@ class HttpEpicsHandlerTest {
         Epic epic = new Epic("Test UpdateEpic",
                 "Teting AddNewEpic");
 
-        String epicJson = gson.toJson(epic);
+        String epicJson = HttpTaskServer.gson.toJson(epic);
 
         // создаём HTTP-клиент и запрос
         HttpClient client = HttpClient.newHttpClient();
@@ -136,7 +138,7 @@ class HttpEpicsHandlerTest {
             assertTrue(jsonElement.isJsonObject(),
                     "Ошибка чтения ответа сервера.");
             Epic newEpic = null;
-            newEpic = gson.fromJson(jsonElement, Epic.class);
+            newEpic = HttpTaskServer.gson.fromJson(jsonElement, Epic.class);
             assertNotNull(newEpic, "Ошибка десериализации эпика.");
             assertEquals(1, newEpic.getId(),
                     "Неожиданный идентификатор эпика");
@@ -173,7 +175,7 @@ class HttpEpicsHandlerTest {
                 "Чтение эпика: неожиданный код ответа сервера");
 
         if (response.statusCode() == 200) {
-            List<Epic> epicListFromServer = gson.fromJson(response.body(), new EpicListTypeToken().getType());
+            List<Epic> epicListFromServer = HttpTaskServer.gson.fromJson(response.body(), new EpicListTypeToken().getType());
 
             assertNotNull(epicListFromServer,
                     "Список эпиков не прочитан.");
@@ -237,7 +239,7 @@ class HttpEpicsHandlerTest {
                 "Чтение подзадач эпика: неожиданный код ответа сервера");
 
         if (response.statusCode() == 200) {
-            List<Subtask> subtasksListFromServer = gson.fromJson(response.body(), new SubtaskListTypeToken().getType());
+            List<Subtask> subtasksListFromServer = HttpTaskServer.gson.fromJson(response.body(), new SubtaskListTypeToken().getType());
 
             assertNotNull(subtasksListFromServer,
                     "Список подзадач эпика не прочитан.");

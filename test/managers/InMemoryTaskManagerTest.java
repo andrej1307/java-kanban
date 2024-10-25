@@ -1,4 +1,6 @@
-import exceptions.TaskCrossTimeException;
+package managers;
+
+import exceptions.TimeIntersectionException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tasks.Epic;
@@ -76,7 +78,7 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
                 "task2",
                 LocalDateTime.now().plusMinutes(10),
                 Duration.ofMinutes(20));
-        assertThrows(TaskCrossTimeException.class,
+        assertThrows(TimeIntersectionException.class,
                 () -> {
                     manager.addNewTask(task);
                 },
@@ -85,7 +87,7 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
 
         // изменяем период задачи на перекрвыающий окончание существующей задачи
         task.setStartTime(LocalDateTime.now().plusMinutes(30));
-        assertThrows(TaskCrossTimeException.class,
+        assertThrows(TimeIntersectionException.class,
                 () -> {
                     manager.addNewTask(task);
                 },
@@ -94,7 +96,7 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
 
         // изменяем период задачи на вложенный во время выполнения существующей задачи
         task.setDuration(Duration.ofMinutes(5));
-        assertThrows(TaskCrossTimeException.class,
+        assertThrows(TimeIntersectionException.class,
                 () -> {
                     manager.addNewTask(task);
                 },
@@ -104,7 +106,7 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
         // изменяем период задачи на перекрвыающий все время выполнения существующей задачи
         task.setStartTime(LocalDateTime.now().plusMinutes(10));
         task.setDuration(Duration.ofMinutes(50));
-        assertThrows(TaskCrossTimeException.class,
+        assertThrows(TimeIntersectionException.class,
                 () -> {
                     manager.addNewTask(task);
                 },

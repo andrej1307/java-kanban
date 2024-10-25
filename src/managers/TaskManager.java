@@ -1,3 +1,7 @@
+package managers;
+
+import exceptions.NotFoundException;
+import exceptions.TimeIntersectionException;
 import tasks.Epic;
 import tasks.Subtask;
 import tasks.Task;
@@ -6,42 +10,42 @@ import java.util.List;
 
 public interface TaskManager {
     // Метод добавления новой задачи
-    int addNewTask(Task newTask);
+    int addNewTask(Task newTask) throws TimeIntersectionException;
 
     // Метод добавления нового эпика
     int addNewEpic(Epic newEpic);
 
     // Метод добавления новоq подзадачи
-    int addNewSubtask(Subtask newSubtask);
+    int addNewSubtask(Subtask newSubtask) throws TimeIntersectionException;
 
     // Метод получения задачи по индексу
-    Task getTask(Integer id);
+    Task getTask(Integer id) throws NotFoundException;
 
     // Метод получения эпика по индексу
-    Epic getEpic(Integer id);
+    Epic getEpic(Integer id) throws NotFoundException;
 
     // Метод получения подзадачи по индексу
-    Subtask getSubtask(Integer id);
+    Subtask getSubtask(Integer id) throws NotFoundException;
 
     // Метод обновления задачи
-    int updateTask(Task task);
+    int updateTask(Task task) throws TimeIntersectionException;
 
     // Метод обновления эпика
     int updateEpic(Epic newEpic);
 
-    int updateSubtask(Subtask newSubtask);
+    int updateSubtask(Subtask newSubtask) throws TimeIntersectionException;
 
-    void removeTask(Integer taskId);
+    void removeTask(Integer taskId) throws NotFoundException;
 
-    void removeEpic(Integer epicId);
+    void removeEpic(Integer epicId) throws NotFoundException;
 
-    void removeSubtask(Integer subtaskId);
+    void removeSubtask(Integer subtaskId) throws NotFoundException;
 
-    List<Task> getTaskList();
+    List<Task> getTaskList() throws NotFoundException;
 
-    List<Epic> getEpicList();
+    List<Epic> getEpicList() throws NotFoundException;
 
-    List<Subtask> getSubtaskList();
+    List<Subtask> getSubtaskList() throws NotFoundException;
 
     // Удаление всех объектов класса Task
     void removeAllTasks();
@@ -58,7 +62,7 @@ public interface TaskManager {
     int getNumberOfObjects();
 
     // просмотр использованных задач
-    List<Task> getHistory();
+    List<Task> getHistory() throws NotFoundException;
 
-    List<Task> getPrioritizedTasks();
+    List<Task> getPrioritizedTasks() throws NotFoundException;
 }

@@ -1,5 +1,8 @@
-import com.google.gson.Gson;
+package httpapi;
+
 import com.google.gson.reflect.TypeToken;
+import managers.InMemoryTaskManager;
+import managers.TaskManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,7 +24,6 @@ import static org.junit.jupiter.api.Assertions.*;
 class HttpPrioritizedHandlerTest {
     TaskManager manager = new InMemoryTaskManager();
     HttpTaskServer taskServer = new HttpTaskServer(manager);
-    Gson gson = taskServer.getGson();
 
     @BeforeEach
     void setUp() throws IOException {
@@ -81,7 +83,7 @@ class HttpPrioritizedHandlerTest {
                 "Чтение хронологии задач: неожиданный код ответа сервера");
 
         if (response.statusCode() == 200) {
-            List<Task> prioritizedFromServer = gson.fromJson(response.body(),
+            List<Task> prioritizedFromServer = HttpTaskServer.gson.fromJson(response.body(),
                     new PrioritizedTypeToken().getType());
 
             assertNotNull(prioritizedFromServer,
@@ -94,7 +96,7 @@ class HttpPrioritizedHandlerTest {
             // проверяем хронологическую последовательность полученного списка задач
             for (int i = 0; i < (prioritizedFromServer.size() - 1); i++) {
                 assertTrue(prioritizedFromServer.get(i).getEndTime()
-                                .isBefore(prioritizedFromServer.get(i+1).getStartTime()),
+                                .isBefore(prioritizedFromServer.get(i + 1).getStartTime()),
                         "Нарушена хронология задач");
             }
         }
