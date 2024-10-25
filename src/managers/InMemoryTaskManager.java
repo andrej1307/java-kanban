@@ -75,7 +75,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     // Метод добавления новой подзадачи
     @Override
-    public int addNewSubtask(Subtask newSubtask)  throws TimeIntersectionException {
+    public int addNewSubtask(Subtask newSubtask) throws TimeIntersectionException {
         if (newSubtask == null) {
             return -1;
         }
@@ -147,7 +147,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     // Метод обновления задачи
     @Override
-    public int updateTask(Task task)  throws TimeIntersectionException {
+    public int updateTask(Task task) throws TimeIntersectionException {
         if (task.getStatus() == null) {
             task.setStatus(TaskStatus.NEW);
         }
@@ -193,7 +193,7 @@ public class InMemoryTaskManager implements TaskManager {
      * @return - id обновленно подзадачи, или меньше нуля если произошла ошибка
      */
     @Override
-    public int updateSubtask(Subtask newSubtask)  throws TimeIntersectionException {
+    public int updateSubtask(Subtask newSubtask) throws TimeIntersectionException {
         if (newSubtask.getStatus() == null) {
             newSubtask.setStatus(TaskStatus.NEW);
         }
@@ -382,7 +382,7 @@ public class InMemoryTaskManager implements TaskManager {
      * @return - список подзадач
      */
     @Override
-    public List<Subtask> getSubtasksByEpic(Integer epicId) throws NotFoundException{
+    public List<Subtask> getSubtasksByEpic(Integer epicId) throws NotFoundException {
         List<Subtask> subtasks = new ArrayList<>();
 
         subtasks = subtaskList.values().stream()
@@ -486,10 +486,10 @@ public class InMemoryTaskManager implements TaskManager {
      * @return - отсортированный список
      */
     @Override
-    public List<Task> getPrioritizedTasks()  throws NotFoundException {
+    public List<Task> getPrioritizedTasks() throws NotFoundException {
 
         if (tasksSortedByTime.isEmpty()) {
-            throw new NotFoundException("Информация не найдена", "список задач пуст" );
+            throw new NotFoundException("Информация не найдена", "список задач пуст");
         }
         List<Task> sortedTaskList = new ArrayList<>();
 
@@ -519,6 +519,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     /**
      * Удаление задачи из отсортированного списка
+     *
      * @param task
      */
     private void removeFromSortedList(Task task) {
@@ -527,6 +528,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     /**
      * Проверка пересечения времени выполнения задачи с временами задач в отсортированном списке
+     *
      * @param newTask - проверяемая задача
      * @return - число пересечений по времени с существующими задачами
      */
