@@ -1,31 +1,30 @@
 package tasks;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Epic extends Task {
-    private List<Integer> subtaskList;
+    private List<Integer> subtasks;
     private LocalDateTime endTime;
-    private Duration duration;
 
     // конструктор с параметрами "имя", "описание"
     public Epic(String title, String description) {
         super(title, description);
-        subtaskList = new ArrayList<>();
+        subtasks = new ArrayList<>();
     }
 
     // конструктор с одним параметром "имя"
     public Epic(String title) {
         super(title);
-        subtaskList = new ArrayList<>();
+        subtasks = new ArrayList<>();
     }
 
     // Конструктор копирования объекта
     public Epic(Epic original) {
         super(original);
-        subtaskList = new ArrayList<>(original.getSubtasks());
+        subtasks = new ArrayList<>(original.getSubtasks());
     }
 
     // Переопределяем метод отображения объекта
@@ -50,44 +49,44 @@ public class Epic extends Task {
         result += ", title='" + getTitle() + '\'' +
                 ", description='" + getDescription() + '\'' +
                 ", status=" + getStatus() +
-                ", subtaskNumber=" + subtaskList.size() +
+                ", subtasks=" + Arrays.toString(subtasks.toArray()) +
                 '}';
         return result;
     }
 
     // получение списка идентификаторов подзадач
     public ArrayList<Integer> getSubtasks() {
-        return new ArrayList<>(subtaskList);
+        return new ArrayList<>(subtasks);
     }
 
     // метод добавления идентификатора подзадачи в список эпика
     public void addSubtask(Integer subtaskId) {
-        int index = subtaskList.indexOf(subtaskId);
+        int index = subtasks.indexOf(subtaskId);
         // Если идентификатор уже существует или равен идентификатору эпика
         // выходим без добавления задачи
         if ((index >= 0) || (subtaskId == getId())) return;
 
-        subtaskList.add(subtaskId);
+        subtasks.add(subtaskId);
     }
 
     // Удаление идентификатора подзадачи из списка эпика
     public void removeSubtask(Integer subtaskId) {
-        int index = subtaskList.indexOf(subtaskId);
+        int index = subtasks.indexOf(subtaskId);
         if (index < 0) {
             return;
         }
-        subtaskList.remove(index);
+        subtasks.remove(index);
     }
 
     public void removeAllSubtasks() {
-        subtaskList.clear();
+        subtasks.clear();
         setStatus(TaskStatus.NEW);
     }
 
     // метод переписывания списка подзадач, массивом новых идентификаторов
-    public void reloadSubtakList(ArrayList<Integer> newSubtaskList) {
-        subtaskList.clear();
-        subtaskList.addAll(newSubtaskList);
+    public void reloadSubtakList(ArrayList<Integer> newsubtasks) {
+        subtasks.clear();
+        subtasks.addAll(newsubtasks);
     }
 
     @Override
@@ -98,13 +97,5 @@ public class Epic extends Task {
     public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
     }
-/*
-    @Override
-    public Duration getDuration() {
-        if (subtaskList.isEmpty()) {
-            return null;
-        }
-        return duration;
-    }
-*/
+
 }

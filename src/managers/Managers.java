@@ -1,3 +1,5 @@
+package managers;
+
 public final class Managers {
     // объект утилитарного класса не должен создаваться!
     // конструктор объявлен с модификатором "private"
@@ -6,7 +8,8 @@ public final class Managers {
 
     // определение объекта меджера задач
     public static TaskManager getDefault() {
-        return new FileBackedTaskManager();
+        InMemoryTaskManager manager = new InMemoryTaskManager();
+        return manager;
     }
 
     // определение объекта журнала событий

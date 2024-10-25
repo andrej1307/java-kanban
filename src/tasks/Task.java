@@ -4,10 +4,11 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+
 public class Task {
     public static final DateTimeFormatter DATE_TIME_FORMATTER =
             DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm");
-    private final String title;   // заголовок задачи не меняется в течении жизни
+    private String title;
     private String description;
     private int id;
     private TaskStatus status;
@@ -103,6 +104,10 @@ public class Task {
             hash = hash + description.hashCode();
         }
         return hash + id;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     // методчтения заголовка задачи

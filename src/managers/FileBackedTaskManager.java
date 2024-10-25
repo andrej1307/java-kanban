@@ -1,3 +1,5 @@
+package managers;
+
 import exceptions.LoadException;
 import exceptions.SaveException;
 import tasks.*;
@@ -12,7 +14,7 @@ import java.time.format.DateTimeParseException;
  */
 public class FileBackedTaskManager extends InMemoryTaskManager {
     private String fileName;
-    private boolean loadInprogres;
+    private boolean loadInprogres = false;
 
     /**
      * Конструктор
@@ -84,26 +86,30 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             fileWriter.write("id;DateTime;Duration(min);type;name;status;description;epic\n");
 
             // сохраняем задачи
-            String taskType = TaskType.TASK.toString();
-            for (Task task : getTaskList()) {
-                fileWriter.write(toString(task).replaceFirst("#type#", taskType)
-                        + "\n");
+            if (!taskList.isEmpty()) {
+                String taskType = TaskType.TASK.toString();
+                for (Task task : taskList.values()) {
+                    fileWriter.write(toString(task).replaceFirst("#type#", taskType)
+                            + "\n");
+                }
             }
 
             // сохраняем эпики
-            taskType = TaskType.EPIC.toString();
-            for (Epic epic : getEpicList()) {
-                fileWriter.write(toString(epic).replaceFirst("#type#", taskType)
-                        + "\n");
+            if (!epicList.isEmpty()) {
+                String taskType = TaskType.EPIC.toString();
+                for (Epic epic : epicList.values()) {
+                    fileWriter.write(toString(epic).replaceFirst("#type#", taskType)
+                            + "\n");
+                }
             }
-
             // сохраняем подзадачи
-            taskType = TaskType.SUBTASK.toString();
-            for (Subtask subtask : getSubtaskList()) {
-                fileWriter.write(toString(subtask).replaceFirst("#type#", taskType)
-                        + subtask.getEpicId() + "\n");
+            if (!subtaskList.isEmpty()) {
+                String taskType = TaskType.SUBTASK.toString();
+                for (Subtask subtask : subtaskList.values()) {
+                    fileWriter.write(toString(subtask).replaceFirst("#type#", taskType)
+                            + subtask.getEpicId() + "\n");
+                }
             }
-
             fileWriter.flush();
 
         } catch (IOException e) {
@@ -118,7 +124,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
      * @param file - файл с описанием задач
      * @return - ссылка на объект менеджера задач
      */
-    static FileBackedTaskManager loadFromFile(File file) throws LoadException {
+    public static FileBackedTaskManager loadFromFile(File file) throws LoadException {
         FileBackedTaskManager manager;
         manager = new FileBackedTaskManager(file.getAbsolutePath());
 
